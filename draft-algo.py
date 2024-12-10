@@ -43,17 +43,17 @@ def save_output(data, file_type, teamName):
     data.to_csv(file_path, index=False)
     print(f"{file_type} saved at {file_path}")
 
-# Function to calculate RSI
-def calculate_rsi(data, window):
-    delta = data['LastPrice'].diff()
-    gain = delta.where(delta > 0, 0).rolling(window=window).mean()
-    loss = -delta.where(delta < 0, 0).rolling(window=window).mean()
+# RSI Calculation Function
+def calculate_rsi(data, window=14):
+    delta = data['Close'].diff(1)
+    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
     rs = gain / loss
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
 # Load historical data
-file_path = '~/Desktop/Daily_Ticks.csv'
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 df = pd.read_csv(file_path)
 
 initial_investment = 10000000
@@ -95,6 +95,7 @@ position = 0
 portfolio_data = []
 statement_data = []
 summary_data = []
+
 
 # Simulate trades
 for index, row in df.iterrows():

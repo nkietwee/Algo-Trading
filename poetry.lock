@@ -218,6 +218,20 @@ files = [
 ]
 
 [[package]]
+name = "ta"
+version = "0.11.0"
+description = "Technical Analysis Library in Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ta-0.11.0.tar.gz", hash = "sha256:de86af43418420bd6b088a2ea9b95483071bf453c522a8441bc2f12bcf8493fd"},
+]
+
+[package.dependencies]
+numpy = "*"
+pandas = "*"
+
+[[package]]
 name = "tzdata"
 version = "2024.2"
 description = "Provider of IANA time zone data"
@@ -285,4 +299,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "759d268debc8ad9eab2f28704693d6d2668b6bc277b894c259177ddfe74536de"
+content-hash = "d2d8ae5944efb9d6fa83fdee39a2befef200e94e3bd203f3f02c47e2bc001bb5"

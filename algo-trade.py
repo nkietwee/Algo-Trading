@@ -10,16 +10,16 @@ team_name = '024_LuckNa'
 
 ################################################################################################################################
 
-output_dir = os.path.expanduser("~/Desktop/competition_api")
+output_dir = os.path.expanduser("~/Desktop/competition_ori_api")
 if not os.path.exists(output_dir):
     os.makedirs(output_dir, exist_ok=True)
     print(f"Created main directory: {output_dir}")
 
 def load_previous(file_type, teamName):
-    output_dir = os.path.expanduser("~/Desktop/competition_api")
+    output_dir = os.path.expanduser("~/Desktop/competition_ori_api")
     folder_path = os.path.join(output_dir, "Previous", file_type)
     file_path = os.path.join(folder_path, f"{teamName}_{file_type}.csv")
-
+    
     if os.path.exists(file_path):
         try:
             data = pd.read_csv(file_path)
@@ -46,10 +46,10 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = '~/Desktop/Daily_Ticks.csv'
+file_path = '~/Desktop/Daily_Ticks.csv' 
 df = pd.read_csv(file_path)
 
-initial_investment = 10000000
+initial_investment = 10000000 
 
 # Load the summary file
 prev_summary_df = load_previous("summary", team_name)
@@ -58,12 +58,12 @@ if prev_summary_df is not None:
     if 'End Line available' in prev_summary_df.columns:
         # ดึงค่าคอลัมน์ 'End Line available' ทั้งหมด
         initial_balance_series = prev_summary_df['End Line available']
-
+        
         # ตรวจสอบว่าคอลัมน์ไม่ว่างเปล่า
         if not initial_balance_series.empty:
             # เข้าถึงค่าแรกของคอลัมน์
             first_value = initial_balance_series.iloc[0]
-
+            
             # ลบเครื่องหมายคั่นหลักพันและแปลงเป็น float
             try:
                 initial_balance = float(str(first_value).replace(',', '').strip())
@@ -120,11 +120,11 @@ statement_data = {
 summary_data = {
     'Table Name': [],
     'File Name': [],
-    'trading_day': [],
+    'trading_day': [],  
     'NAV': [],
     'Portfolio value': [],
     'End Line available': [],
-    'Number of wins': [],
+    'Number of wins': [], 
     'Number of matched trades': [],
     'Number of transactions:': [],
     'Net Amount': [],
@@ -180,12 +180,12 @@ count_sell = 1
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
-    'trading_day': [1],
+    'trading_day': [1],  
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
     'End Line available': [last_end_line_available],  # Use the correct End Line Available
     'Start Line available':[Start_Line_available],
-    'Number of wins': [count_win],
+    'Number of wins': [count_win], 
     'Number of matched trades': [count_sell], #นับ sell เพราะ เทรดbuy sellด้วย volume เท่ากัน
     'Number of transactions:': [len(statement_df)],
     'Net Amount': [statement_df['Amount Cost'].sum()],

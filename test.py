@@ -4,7 +4,11 @@ import os
 
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/*.csv")
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
-file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
+
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+df = pd.read_csv(file_path)
+
 if os.path.exists(file_path):
     df = pd.read_csv(file_path)
     print(df)
