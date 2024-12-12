@@ -246,6 +246,7 @@ last_end_line_available = initial_balance
 if statement_df is not None:
     count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
     count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
+
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
