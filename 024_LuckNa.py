@@ -124,8 +124,8 @@ portfolio_data = {
     'Actual Vol': [],
     'Avg Cost': [],
     'Market Price': [],
-    'Market Value': [],
     'Amount Cost': [],
+    'Market Value': [],
     'Unrealized P/L': [],
     '% Unrealized P/L': [],
     'Realized P/L': []
@@ -141,7 +141,7 @@ statement_data = {
     'Volume': [],
     'Price': [],
     'Amount Cost': [],
-    'End Line Available': []
+    'End_line_available': []
 }
 
 # List of variable trading volumes
@@ -245,7 +245,7 @@ summary_data = {
     'Minimum value': [statement_df['End Line Available'].min() if not statement_df.empty else 0],  # Minimum cash balance
     'Win rate': [(sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0) / len(statement_df) * 100) if len(statement_df) > 0 else 0],  # Win rate percentage
     'Calmar Ratio': [(balance + portfolio * last_price - initial_investment) / (balance - statement_df['End Line Available'].min() if not statement_df.empty else 1)],  # Calmar Ratio
-    'Relative Ratio': [(balance - statement_df['End Line Available'].min()) / initial_investment * 100 if not statement_df.empty else 0],  # Relative Ratio
+    'Relative Drawdown': [((statement_df['End Line Available'].max() - statement_df['End Line Available'].min()) / statement_df['End Line Available'].max() * 100) if not statement_df.empty else 0],  # Relative Drawdown
     'Maximum Drawdown': [(statement_df['End Line Available'].max() - statement_df['End Line Available'].min()) if not statement_df.empty else 0],  # Maximum Drawdown
     '%Return': [(balance + portfolio * last_price - initial_investment) / initial_investment * 100],  # % Return on initial investment
 }
