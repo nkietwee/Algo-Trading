@@ -11,13 +11,13 @@ team_name = '024_LuckNa'
 
 ################################################################################################################################
 
-output_dir = os.path.expanduser("~/Desktop/competition_api_new")
+output_dir = os.path.expanduser("~/Desktop/competition_api")
 if not os.path.exists(output_dir):
     os.makedirs(output_dir, exist_ok=True)
     print(f"Created main directory: {output_dir}")
 
 def load_previous(file_type, teamName):
-    output_dir = os.path.expanduser("~/Desktop/competition_api_new")
+    output_dir = os.path.expanduser("~/Desktop/competition_api")
     folder_path = os.path.join(output_dir, "Previous", file_type)
     file_path = os.path.join(folder_path, f"{teamName}_{file_type}.csv")
     
@@ -248,8 +248,6 @@ last_end_line_available = initial_balance
 if statement_df is not None:
     count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
     count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
-    print(f'count_win : {count_win}')
-    print(f'count_sell : {count_sell}')
     if count_sell == 0:
         # extract previous day
         win_rate = prev_win_rate
