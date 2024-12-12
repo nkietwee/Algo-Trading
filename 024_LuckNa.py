@@ -56,7 +56,6 @@ initial_investment = 10000000
 prev_summary_df = load_previous("summary", team_name)
 
 if prev_summary_df is not None:
-    # print("if")
     if 'End Line available' in prev_summary_df.columns:
         # ดึงค่าคอลัมน์ 'End Line available' ทั้งหมด
         initial_balance_series = prev_summary_df['End Line available']
@@ -70,6 +69,8 @@ if prev_summary_df is not None:
             try:
                 initial_balance = float(str(first_value).replace(',', '').strip())
                 Start_Line_available = initial_balance
+                prev_win_rate = prev_summary_df['Win rate'][0]
+                # print(f'pre_win_rate : {prev_win_rate}')
                 print("End Line available column loaded successfully.")
                 print(f"Initial initial_balance (first value): {initial_balance}")
             except ValueError:
@@ -84,6 +85,7 @@ if prev_summary_df is not None:
 else:
     initial_balance = initial_investment  # ใช้ค่าตั้งต้นหากไฟล์ไม่โหลด
     Start_Line_available = initial_investment
+    prev_win_rate = 0
     print(f"Initial initial_balance = initial_investment: {initial_investment}")
 
 ################################################################################################################################
@@ -246,6 +248,17 @@ last_end_line_available = initial_balance
 if statement_df is not None:
     count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
     count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
+    # print(f'count_sell : {count_sell}')
+    if count_sell == 384:
+        # extract previous day
+        win_rate = prev_win_rate
+        # print(f'win_rate : {win_rate}')
+    else:
+        win_rate = (count_win * 100) / count_sell
+else:
+    count_win = 0
+    count_sell = 0
+    win_rate = 0
 
 summary_data = {
     'Table Name': ['Sum_file'],
@@ -264,7 +277,7 @@ summary_data = {
     'Realized P/L': [portfolio_df['Realized P/L'].sum()],
     'Maximum value': [statement_df['End Line available'].max()],
     'Minimum value': [statement_df['End Line available'].min()],
-    'Win rate': [(count_win * 100)/ count_sell],
+    'Win rate': [win_rate],
     'Calmar Ratio': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
                            ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000)],
     'Relative Drawdown': [(portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100],
