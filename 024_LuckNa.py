@@ -153,13 +153,11 @@ for index, row in df.iterrows():
     price = row['LastPrice']
     rsi = row['RSI']
     date_time = row['TradeDateTime']
-    # volume = row['Volume']
 
     # Split date and time
     date = date_time.split()[0]
     time = date_time.split()[1]
 
-    # Randomly select a volume for each trade
     volume = np.random.choice(volume_options)
     # Buy condition
     if rsi < buy_threshold and balance >= price * volume:
