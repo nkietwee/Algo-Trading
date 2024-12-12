@@ -42,7 +42,8 @@ import os
 # # print(end)
 # print((end - start).days)
 
-# import pandas as pd
+import pandas as pd
 
 # df = pd.read_csv("/home/nkietwee/Desktop/competition_api_new/Previous/summary/024_LuckNa_summary.csv")
-# print(df)
+df = pd.read_csv("/home/nkietwee/Desktop/competition_api_new/Result/summary/024_LuckNa_summary.csv")
+print(df)

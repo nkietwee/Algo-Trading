@@ -248,8 +248,9 @@ last_end_line_available = initial_balance
 if statement_df is not None:
     count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
     count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
-    # print(f'count_sell : {count_sell}')
-    if count_sell == 384:
+    print(f'count_win : {count_win}')
+    print(f'count_sell : {count_sell}')
+    if count_sell == 0:
         # extract previous day
         win_rate = prev_win_rate
         # print(f'win_rate : {win_rate}')
