@@ -179,13 +179,39 @@ for index, row in df.iterrows():
         statement_data['Amount Cost'].append(cost)
         statement_data['End Line Available'].append(balance)
 
+        # Update portfolio data for the buy
+        portfolio_data['Table Name'].append('Portfolio_file')
+        portfolio_data['File Name'].append(team_name)
+        portfolio_data['Stock name'].append(stock_name)
+        portfolio_data['Start Vol'].append(0)  # Starting volume (before buying)
+        portfolio_data['Actual Vol'].append(portfolio)  # Update current portfolio
+        portfolio_data['Avg Cost'].append(price)
+        portfolio_data['Market Price'].append(price)
+        portfolio_data['Market Value'].append(portfolio * price)
+        portfolio_data['Amount Cost'].append(cost)
+        portfolio_data['Unrealized P/L'].append(0)  # Unrealized P/L is 0 after buy
+        portfolio_data['% Unrealized P/L'].append(0)
+        portfolio_data['Realized P/L'].append(0)  # No realized P/L for buy
     # Sell condition
     elif rsi > sell_threshold and portfolio > 0:
-        # print('more than')
         revenue = price * portfolio
         balance += revenue
-        profit = (price - last_price) * portfolio
-        portfolio = 0
+        realized_pl = (price - last_price) * portfolio  # Profit from the sale
+        portfolio = 0  # Reset portfolio after selling
+
+        # Update portfolio data for the sell
+        portfolio_data['Table Name'].append('Portfolio_file')
+        portfolio_data['File Name'].append(team_name)
+        portfolio_data['Stock name'].append(stock_name)
+        portfolio_data['Start Vol'].append(portfolio)  # Volume before selling
+        portfolio_data['Actual Vol'].append(portfolio)  # Volume after selling
+        portfolio_data['Avg Cost'].append(last_price)
+        portfolio_data['Market Price'].append(price)
+        portfolio_data['Market Value'].append(0)  # Market value after selling is 0
+        portfolio_data['Amount Cost'].append(0)  # No cost after selling
+        portfolio_data['Unrealized P/L'].append(0)
+        portfolio_data['% Unrealized P/L'].append(0)
+        portfolio_data['Realized P/L'].append(realized_pl)
 
         # Log the trade in the statement
         statement_data['Table Name'].append('Statement_file')
@@ -206,16 +232,22 @@ statement_df = pd.DataFrame(statement_data)
 summary_data = {
     'Table Name': ['Summary_file'],
     'File Name': [team_name],
-    'NAV': [balance + portfolio * last_price],  # Net Asset Value
-    'Portfolio value': [portfolio * last_price],
-    'End Line available': [balance],
-    'Number of wins': [0],  # Update logic to count wins
-    'Number of matched trades': [len(statement_df)],  # Total trades
-    'Unrealized P/L': [(portfolio * last_price) - (portfolio * last_price if last_price > 0 else 0)],
-    '% Unrealized P/L': [(portfolio * last_price / initial_investment * 100) if initial_investment else 0],
-    'Realized P/L': [0],  # Update logic for realized profit
-    'Maximum Drawdown': [0],  # Implement max drawdown logic
-    '%Return': [(balance + portfolio * last_price - initial_investment) / initial_investment * 100],
+    'Portfolio value': [portfolio * last_price],  # Total value of portfolio
+    'End Line available': [balance],  # Final cash balance
+    'Start Line available': [initial_investment],  # Starting cash balance
+    'Number of wins': [sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)],  # Count of profitable trades
+    'Number of matched trades': [len(statement_df)],  # Total trades (both buy and sell)
+    'Number of transactions': [len(statement_df)],  # Total transactions
+    'Sum of Unrealized P/L': [(portfolio * last_price) - (portfolio * last_price if last_price > 0 else 0)],
+    'Sum of %Unrealized P/L': [(portfolio * last_price / initial_investment * 100) if initial_investment else 0],
+    'Sum of Realized P/L': [sum(row['Amount Cost'] for _, row in statement_df.iterrows() if row['Side'] == 'Sell')],  # Total realized profits
+    'Maximum value': [statement_df['End Line Available'].max() if not statement_df.empty else 0],  # Maximum cash balance
+    'Minimum value': [statement_df['End Line Available'].min() if not statement_df.empty else 0],  # Minimum cash balance
+    'Win rate': [(sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0) / len(statement_df) * 100) if len(statement_df) > 0 else 0],  # Win rate percentage
+    'Calmar Ratio': [(balance + portfolio * last_price - initial_investment) / (balance - statement_df['End Line Available'].min() if not statement_df.empty else 1)],  # Calmar Ratio
+    'Relative Ratio': [(balance - statement_df['End Line Available'].min()) / initial_investment * 100 if not statement_df.empty else 0],  # Relative Ratio
+    'Maximum Drawdown': [(statement_df['End Line Available'].max() - statement_df['End Line Available'].min()) if not statement_df.empty else 0],  # Maximum Drawdown
+    '%Return': [(balance + portfolio * last_price - initial_investment) / initial_investment * 100],  # % Return on initial investment
 }
 
 summary_df = pd.DataFrame(summary_data)
