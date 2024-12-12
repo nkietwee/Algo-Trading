@@ -11,13 +11,13 @@ team_name = '024_LuckNa'
 
 ################################################################################################################################
 
-output_dir = os.path.expanduser("~/Desktop/competition_api")
+output_dir = os.path.expanduser("~/Desktop/competition_api_new")
 if not os.path.exists(output_dir):
     os.makedirs(output_dir, exist_ok=True)
     print(f"Created main directory: {output_dir}")
 
 def load_previous(file_type, teamName):
-    output_dir = os.path.expanduser("~/Desktop/competition_api")
+    output_dir = os.path.expanduser("~/Desktop/competition_api_new")
     folder_path = os.path.join(output_dir, "Previous", file_type)
     file_path = os.path.join(folder_path, f"{teamName}_{file_type}.csv")
     
@@ -144,18 +144,23 @@ statement_data = {
     'End Line Available': []
 }
 
+# List of variable trading volumes
+volume_options = [100, 200, 300, 500]
+
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
     price = row['LastPrice']
     rsi = row['RSI']
     date_time = row['TradeDateTime']
-    volume = row['Volume']
+    # volume = row['Volume']
 
     # Split date and time
     date = date_time.split()[0]
     time = date_time.split()[1]
 
+    # Randomly select a volume for each trade
+    volume = np.random.choice(volume_options)
     # Buy condition
     if rsi < buy_threshold and balance >= price * volume:
         # print('less than')
