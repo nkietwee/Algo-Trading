@@ -47,13 +47,15 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241212.csv') 
 df = pd.read_csv(file_path)
 
 initial_investment = 10000000 
 
-# Load the summary file
+# Load the prev file
 prev_summary_df = load_previous("summary", team_name)
+# prev_statement_df = load_previous("statement", team_name)
+prev_portfolio_df = load_previous("portfolio", team_name)
 
 if prev_summary_df is not None:
     if 'End Line available' in prev_summary_df.columns:
@@ -87,6 +89,49 @@ else:
     Start_Line_available = initial_investment
     prev_win_rate = 0
     print(f"Initial initial_balance = initial_investment: {initial_investment}")
+
+# change to numpy array
+if prev_portfolio_df is not None:
+    stock_symbols = ["ADVANC", "AOT", "AWC", "BANPU", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH",
+    "BJC", "BTS", "CBG", "CENTEL", "COM7", "CPALL", "CPF", "CPN", "CRC", "DELTA",
+    "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL",
+    "JMART", "JMT", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT",
+    "PTTEP", "PTTGC", "RATCH", "SAWAD", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO",
+    "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
+
+    cnt_act_vol = [("stock", 0, 0)] * 55
+    # last_rows = prev_portfolio_df.groupby('Stock name').last()[['Start Vol', 'Actual Vol']]
+    last_rows = prev_portfolio_df.groupby('Stock name').last()[['Actual Vol']]
+    last_values = [(stock, *row) for stock, row in last_rows.iterrows()]
+    print(last_rows)
+    print(f'last_volumes : {last_values}')
+    # print(f'len:  {len(last_values)}')
+    # for i in range(len(stock_symbols)):
+    #     cnt_act_vol.insert(i, (str(stock_symbols[i]), int(last_values.loc[stock_symbols[i], 'Start Vol']), int(last_values.loc[stock_symbols[i], 'Actual Vol'])))
+    # print(f'i : {i}')
+    # print(f'cnt_act : {cnt_act_vol}')
+    # print(f'len_cnt_act : {len(cnt_act_vol)}')
+    # print(f'len_stock : {len(stock_symbols)}')
+    # if 'Actual Vol' in prev_portfolio_df.columns:
+        # prev = prev_portfolio_df[['Stock name', 'Actual Vol']]
+        # prev.g
+        # for index, row in prev.iterrows():
+        #     # print(f'index : {index}')
+        #     # print(f'stock : {row['Stock name']}, Avtual Vol : {row['Actual Vol']}')
+        #     for i in range (len(stock_symbols)):
+        #         if row['Stock name'] == stock_symbols[i]:
+        #             cnt_act_vol.insert(i, row['Actual Vol'])
+            # if stock_symbols in stock_symbols:
+
+        # print(cnt_act_vol)
+            # if i == "ADVANC":
+                # print(f'act_vol : {act_vol}')
+        # for i in range(len(stock_symbols)):
+            # cnt.insert(i, )
+        # print(prev)
+    # print("prev portfolio")
+
+
 
 ################################################################################################################################
 
@@ -156,6 +201,7 @@ summary_data = {
     '%Return': []
 }
 
+
 # List of variable trading volumes
 volume_options = [100, 200, 300, 500]
 
@@ -183,6 +229,7 @@ for index, row in df.iterrows():
         statement_data['Table Name'].append('Statement_file')
         statement_data['File Name'].append(team_name)
         statement_data['Stock Name'].append(stock_name)
+
         statement_data['Date'].append(date)
         statement_data['Time'].append(time)
         statement_data['Side'].append('Buy')
