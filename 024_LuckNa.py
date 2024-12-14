@@ -99,12 +99,14 @@ if prev_portfolio_df is not None:
     "PTTEP", "PTTGC", "RATCH", "SAWAD", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO",
     "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
 
-    cnt_act_vol = [("stock", 0, 0)] * 55
+    # cnt_act_vol = [("stock", 0, 0)] * 55
     # last_rows = prev_portfolio_df.groupby('Stock name').last()[['Start Vol', 'Actual Vol']]
     last_rows = prev_portfolio_df.groupby('Stock name').last()[['Actual Vol']]
     last_values = [(stock, *row) for stock, row in last_rows.iterrows()]
-    print(last_rows)
-    print(f'last_volumes : {last_values}')
+    # print(last_rows)
+    # print(f'last_volumes : {last_values}')
+
+
     # print(f'len:  {len(last_values)}')
     # for i in range(len(stock_symbols)):
     #     cnt_act_vol.insert(i, (str(stock_symbols[i]), int(last_values.loc[stock_symbols[i], 'Start Vol']), int(last_values.loc[stock_symbols[i], 'Actual Vol'])))
@@ -145,8 +147,8 @@ sell_threshold = 70
 
 # Initialize trading variables
 initial_balance = initial_investment
-portfolio = 0  # Shares held
-portfolio_value = 0
+act_vol = 0  # Shares held
+start_vol = 0
 last_price = 0
 
 # Dictionaries for portfolio and statement
@@ -219,10 +221,10 @@ for index, row in df.iterrows():
     volume = np.random.choice(volume_options)
     # Buy condition
     if rsi < buy_threshold and initial_balance >= price * volume:
-        # print('less than')
         cost = price * volume
         initial_balance -= cost
-        portfolio += volume
+        start_vol = act_vol
+        act_vol += volume
         last_price = price
 
         # Log the trade in the statement
@@ -242,28 +244,28 @@ for index, row in df.iterrows():
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
-        portfolio_data['Start Vol'].append(0)  # Starting volume (before buying)
-        portfolio_data['Actual Vol'].append(portfolio)  # Update current portfolio
+        portfolio_data['Start Vol'].append(start_vol)  # Starting volume (before buying)
+        portfolio_data['Actual Vol'].append(act_vol)  # Update current act_vol
         portfolio_data['Avg Cost'].append(price)
         portfolio_data['Market Price'].append(price)
-        portfolio_data['Market Value'].append(portfolio * price)
+        portfolio_data['Market Value'].append(act_vol * price)
         portfolio_data['Amount Cost'].append(cost)
         portfolio_data['Unrealized P/L'].append(0)  # Unrealized P/L is 0 after buy
         portfolio_data['% Unrealized P/L'].append(0)
         portfolio_data['Realized P/L'].append(0)  # No realized P/L for buy
     # Sell condition
-    elif rsi > sell_threshold and portfolio > 0:
-        revenue = price * portfolio
+    elif rsi > sell_threshold and act_vol > 0:
+        revenue = price * act_vol
         initial_balance += revenue
-        realized_pl = (price - last_price) * portfolio  # Profit from the sale
-        portfolio = 0  # Reset portfolio after selling
-
-        # Update portfolio data for the sell
+        realized_pl = (price - last_price) * act_vol  # Profit from the sale
+        start_vol = act_vol
+        act_vol -= volume 
+        # Update act_vol data for the sell
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
-        portfolio_data['Start Vol'].append(portfolio)  # Volume before selling
-        portfolio_data['Actual Vol'].append(portfolio)  # Volume after selling
+        portfolio_data['Start Vol'].append(start_vol)  # Volume before selling
+        portfolio_data['Actual Vol'].append(act_vol)  # Volume after selling
         portfolio_data['Avg Cost'].append(last_price)
         portfolio_data['Market Price'].append(price)
         portfolio_data['Market Value'].append(0)  # Market value after selling is 0
