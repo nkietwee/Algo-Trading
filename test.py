@@ -42,11 +42,11 @@ import os
 # # print(end)
 # print((end - start).days)
 
-# import pandas as pd
+import pandas as pd
 
-# # df = pd.read_csv("/home/nkietwee/Desktop/competition_api_new/Previous/summary/024_LuckNa_summary.csv")
-# df = pd.read_csv("/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv")
-# print(df)
+# df = pd.read_csv("/home/nkietwee/Desktop/competition_api_new/Previous/summary/024_LuckNa_summary.csv")
+df = pd.read_csv("/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv")
+print(df)
 
 # def cnt_stock(stock_name):
 #     stock_symbols = ["ADVANC","AOT","AWC","BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC",
@@ -76,7 +76,3 @@ import os
 
 # lst = cnt_stock("WHA", 0 , 400)
 # print(lst)
-
-vol = [(0, 0)] * 10
-vol.insert(5, (10, 11))
-print(vol[5][0])

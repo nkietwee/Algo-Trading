@@ -100,26 +100,15 @@ stock_symbols = ["ADVANC", "AOT", "AWC", "BANPU", "BBL", "BCP", "BDMS", "BEM", "
 
 # change to numpy array
 if prev_portfolio_df is not None:
-    vol_act_dict = {}
+    prev_act_dict = {}
     last_rows = prev_portfolio_df.groupby('Stock name')['Actual Vol'].last()
-    # vol_dict = {stock: (int(last_rows[stock])) if stock in last_rows.index else 0 for stock in stock_symbols}
-    for stock in stock_symbols:
-        if stock in last_rows.index:
-            vol_act_dict[stock] = (int(last_rows[stock])) 
-        else:
-            vol_act_dict[stock] = 0
+    prev_act_dict = dict(last_rows)
+    
+    stock_dfs = df['ShareCode'].unique() # current stock
 
-    # vol_dict = {stock : ()}
-    # for stock_name, row in last_rows.iterrows():
-    #     if stock_name in stock_symbols:
-    #         vol.append((stock_name, (int(row['Start Vol']), int(row['Actual Vol']))))
-    # vol_dict = dict(vol)
-    # print(vol_act_dict)
-    # exit()
-else:
-    vol_dict = {stock : (0) for stock in stock_symbols}
-    # print(vol_dict)
-    # exit()
+    for stock_df in stock_dfs:
+        if stock_df not in prev_act_dict:
+            prev_act_dict[stock_df] = 0
 
 
 ################################################################################################################################
@@ -210,17 +199,11 @@ for index, row in df.iterrows():
     if rsi < buy_threshold and initial_balance >= price * volume:
         cost = price * volume
         initial_balance -= cost
-        start_vol = 0
         last_price = price
-        vol = [(0, 0)] * 55
-        if stock_name in stock_symbols:
-            # print(f'{stock_name} : ({vol_dict[stock_name][0]} ,{vol_dict[stock_name][1]})')
-            start_vol = int(vol_act_dict[stock_name]) #act_vol
-            act_vol = int(vol_act_dict[stock_name])
-            act_vol += volume
-            vol_act_dict[stock_name] = (act_vol)
-        # print(f'{stock_name} : ({vol_dict[stock_name][0]} ,{vol_dict[stock_name][1]})')
-        # exit()
+
+        start_vol = int(prev_act_dict[stock_name]) #act_vol
+        act_vol = start_vol + volume
+        prev_act_dict[stock_name] = (act_vol)
 
         # Log the trade in the statement
         statement_data['Table Name'].append('Statement_file')
@@ -239,10 +222,8 @@ for index, row in df.iterrows():
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
-        # portfolio_data['Start Vol'].append(start_vol)
-        # portfolio_data['Actual Vol'].append(act_vol)
         portfolio_data['Start Vol'].append(start_vol)
-        portfolio_data['Actual Vol'].append(vol_act_dict[stock_name])
+        portfolio_data['Actual Vol'].append(prev_act_dict[stock_name])
 
         portfolio_data['Avg Cost'].append(price)
         portfolio_data['Market Price'].append(price)
@@ -256,20 +237,16 @@ for index, row in df.iterrows():
         revenue = price * act_vol
         initial_balance += revenue
         realized_pl = (price - last_price) * act_vol  # Profit from the sale
-        # start_vol = act_vol
-        # act_vol -= volume
-        if stock_name in stock_symbols:
-            # print(f'{stock_name} : ({vol_dict[stock_name][0]} ,{vol_dict[stock_name][1]})')
-            start_vol = int(vol_act_dict[stock_name]) #act_vol
-            act_vol = int(vol_act_dict[stock_name])
-            act_vol -= volume
-            vol_act_dict[stock_name] = (act_vol)
+        start_vol = int(prev_act_dict[stock_name]) #act_vol
+        act_vol = start_vol - volume
+        prev_act_dict[stock_name] = (act_vol)
+        
         # Update act_vol data for the sell
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
         portfolio_data['Start Vol'].append(start_vol)
-        portfolio_data['Actual Vol'].append(vol_act_dict[stock_name])
+        portfolio_data['Actual Vol'].append(prev_act_dict[stock_name])
         portfolio_data['Avg Cost'].append(last_price)
         portfolio_data['Market Price'].append(price)
         portfolio_data['Market Value'].append(0)  # Market value after selling is 0
