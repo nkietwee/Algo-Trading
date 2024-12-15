@@ -58,21 +58,25 @@ import os
 #     if stock_name in stock_symbols:
 #         cnt
 
-def cnt_stock(stock_name, start, amount):
-    stock_symbols = ["ADVANC","AOT","AWC","BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC",
-                  "BTS", "CBG", "CENTEL", "CPALL", "CPF", "CPN", "CRC", "DELTA", "EA", "EGCO",
-                  "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL", "KBANK", "KTB",
-                  "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT", "PTTEP", "PTTGC", "RATCH",
-                  "SCB", "SCC", "SCGP", "TIDLOR", "TISCO", "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
-    cnt = [0] * 50
-    print(f'len : {len(stock_symbols)}')
-    print(f'cnt : {len(cnt)}')
-    for i in range(len(stock_symbols)):
-        if stock_name == stock_symbols[i]:
-            print(f'i : {i}')
-            cnt.insert(i, start + amount)
-            break
-    return cnt
+# def cnt_stock(stock_name, start, amount):
+#     stock_symbols = ["ADVANC","AOT","AWC","BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC",
+#                   "BTS", "CBG", "CENTEL", "CPALL", "CPF", "CPN", "CRC", "DELTA", "EA", "EGCO",
+#                   "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL", "KBANK", "KTB",
+#                   "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT", "PTTEP", "PTTGC", "RATCH",
+#                   "SCB", "SCC", "SCGP", "TIDLOR", "TISCO", "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
+#     cnt = [0] * 50
+#     print(f'len : {len(stock_symbols)}')
+#     print(f'cnt : {len(cnt)}')
+#     for i in range(len(stock_symbols)):
+#         if stock_name == stock_symbols[i]:
+#             print(f'i : {i}')
+#             cnt.insert(i, start + amount)
+#             break
+#     return cnt
 
-lst = cnt_stock("WHA", 0 , 400)
-print(lst)
+# lst = cnt_stock("WHA", 0 , 400)
+# print(lst)
+
+vol = [(0, 0)] * 10
+vol.insert(5, (10, 11))
+print(vol[5][0])

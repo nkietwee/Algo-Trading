@@ -90,49 +90,29 @@ else:
     prev_win_rate = 0
     print(f"Initial initial_balance = initial_investment: {initial_investment}")
 
-# change to numpy array
-if prev_portfolio_df is not None:
-    stock_symbols = ["ADVANC", "AOT", "AWC", "BANPU", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH",
+stock_symbols = ["ADVANC", "AOT", "AWC", "BANPU", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH",
     "BJC", "BTS", "CBG", "CENTEL", "COM7", "CPALL", "CPF", "CPN", "CRC", "DELTA",
     "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL",
     "JMART", "JMT", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT",
     "PTTEP", "PTTGC", "RATCH", "SAWAD", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO",
     "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
 
-    # cnt_act_vol = [("stock", 0, 0)] * 55
-    # last_rows = prev_portfolio_df.groupby('Stock name').last()[['Start Vol', 'Actual Vol']]
-    last_rows = prev_portfolio_df.groupby('Stock name').last()[['Actual Vol']]
-    last_values = [(stock, *row) for stock, row in last_rows.iterrows()]
-    # print(last_rows)
-    # print(f'last_volumes : {last_values}')
 
+# change to numpy array
+if prev_portfolio_df is not None:
 
-    # print(f'len:  {len(last_values)}')
-    # for i in range(len(stock_symbols)):
-    #     cnt_act_vol.insert(i, (str(stock_symbols[i]), int(last_values.loc[stock_symbols[i], 'Start Vol']), int(last_values.loc[stock_symbols[i], 'Actual Vol'])))
-    # print(f'i : {i}')
-    # print(f'cnt_act : {cnt_act_vol}')
-    # print(f'len_cnt_act : {len(cnt_act_vol)}')
-    # print(f'len_stock : {len(stock_symbols)}')
-    # if 'Actual Vol' in prev_portfolio_df.columns:
-        # prev = prev_portfolio_df[['Stock name', 'Actual Vol']]
-        # prev.g
-        # for index, row in prev.iterrows():
-        #     # print(f'index : {index}')
-        #     # print(f'stock : {row['Stock name']}, Avtual Vol : {row['Actual Vol']}')
-        #     for i in range (len(stock_symbols)):
-        #         if row['Stock name'] == stock_symbols[i]:
-        #             cnt_act_vol.insert(i, row['Actual Vol'])
-            # if stock_symbols in stock_symbols:
-
-        # print(cnt_act_vol)
-            # if i == "ADVANC":
-                # print(f'act_vol : {act_vol}')
-        # for i in range(len(stock_symbols)):
-            # cnt.insert(i, )
-        # print(prev)
-    # print("prev portfolio")
-
+    vol = []
+    last_rows = prev_portfolio_df.groupby('Stock name')[['Start Vol', 'Actual Vol']].last()
+    for stock_name, row in last_rows.iterrows():
+        if stock_name in stock_symbols:
+            vol.append((stock_name, (int(row['Start Vol']), int(row['Actual Vol']))))
+    vol_dict = dict(vol)
+    print(vol_dict)
+    # exit()
+else:
+    vol_dict = {stock : (0, 0) for stock in stock_symbols}
+    # print(vol_dict)
+    # exit()
 
 
 ################################################################################################################################
@@ -223,9 +203,17 @@ for index, row in df.iterrows():
     if rsi < buy_threshold and initial_balance >= price * volume:
         cost = price * volume
         initial_balance -= cost
-        start_vol = act_vol
-        act_vol += volume
+        start_vol = 0
         last_price = price
+        vol = [(0, 0)] * 55
+        if stock_name in stock_symbols:
+            # print(f'{stock_name} : ({vol_dict[stock_name][0]} ,{vol_dict[stock_name][1]})')
+            start_vol = int(vol_dict[stock_name][1]) #act_vol
+            act_vol = int(vol_dict[stock_name][1])
+            act_vol += volume
+            vol_dict[stock_name] = (start_vol, act_vol)
+        # print(f'{stock_name} : ({vol_dict[stock_name][0]} ,{vol_dict[stock_name][1]})')
+        # exit()
 
         # Log the trade in the statement
         statement_data['Table Name'].append('Statement_file')
@@ -244,8 +232,11 @@ for index, row in df.iterrows():
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
-        portfolio_data['Start Vol'].append(start_vol)  # Starting volume (before buying)
-        portfolio_data['Actual Vol'].append(act_vol)  # Update current act_vol
+        # portfolio_data['Start Vol'].append(start_vol)
+        # portfolio_data['Actual Vol'].append(act_vol)
+        portfolio_data['Start Vol'].append(vol_dict[stock_name][0])
+        portfolio_data['Actual Vol'].append(vol_dict[stock_name][1])
+
         portfolio_data['Avg Cost'].append(price)
         portfolio_data['Market Price'].append(price)
         portfolio_data['Market Value'].append(act_vol * price)
@@ -258,14 +249,20 @@ for index, row in df.iterrows():
         revenue = price * act_vol
         initial_balance += revenue
         realized_pl = (price - last_price) * act_vol  # Profit from the sale
-        start_vol = act_vol
-        act_vol -= volume 
+        # start_vol = act_vol
+        # act_vol -= volume
+        if stock_name in stock_symbols:
+            # print(f'{stock_name} : ({vol_dict[stock_name][0]} ,{vol_dict[stock_name][1]})')
+            start_vol = int(vol_dict[stock_name][1]) #act_vol
+            act_vol = int(vol_dict[stock_name][1])
+            act_vol -= volume
+            vol_dict[stock_name] = (start_vol, act_vol)
         # Update act_vol data for the sell
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
-        portfolio_data['Start Vol'].append(start_vol)  # Volume before selling
-        portfolio_data['Actual Vol'].append(act_vol)  # Volume after selling
+        portfolio_data['Start Vol'].append(vol_dict[stock_name][0])
+        portfolio_data['Actual Vol'].append(vol_dict[stock_name][1])
         portfolio_data['Avg Cost'].append(last_price)
         portfolio_data['Market Price'].append(price)
         portfolio_data['Market Value'].append(0)  # Market value after selling is 0
