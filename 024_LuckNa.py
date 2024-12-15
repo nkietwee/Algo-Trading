@@ -240,14 +240,12 @@ for index, row in df.iterrows():
         portfolio_data['Market Value'].append(act_vol * price)
         portfolio_data['Amount Cost'].append(stock_totals[stock_name]['total_cost'])
 
-# Unrealized P/L=(Market Price−Avg Cost)×Actual Volume
         unreal = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
         if stock_totals[stock_name]['avg_cost'] > 0:
             percent_unrealized_pl = ((price - stock_totals[stock_name]['avg_cost']) / stock_totals[stock_name]['avg_cost']) * 100
         else:
             percent_unrealized_pl = 0  # Avoid division by zero
         portfolio_data['Unrealized P/L'].append(unreal)
-        # portfolio_data['% Unrealized P/L'].append(0)
         portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
         portfolio_data['Realized P/L'].append(0)  # No realized P/L for buy
     # Sell condition
@@ -276,14 +274,13 @@ for index, row in df.iterrows():
         portfolio_data['Market Value'].append(act_vol * price)  # Market value after selling is 0
         portfolio_data['Amount Cost'].append(stock_totals[stock_name]['total_cost'])  # No cost after selling
 
-        unreal = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
-        if stock_totals[stock_name]['avg_cost'] > 0:
-            percent_unrealized_pl = ((price - stock_totals[stock_name]['avg_cost']) / stock_totals[stock_name]['avg_cost']) * 100
-        else:
-            percent_unrealized_pl = 0 
-        portfolio_data['Unrealized P/L'].append(unreal)
-        # portfolio_data['% Unrealized P/L'].append(0)
-        portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
+        realized_pl = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
+        # if stock_totals[stock_name]['avg_cost'] > 0:
+        #     percent_unrealized_pl = ((price - stock_totals[stock_name]['avg_cost']) / stock_totals[stock_name]['avg_cost']) * 100
+        # else:
+        #     percent_unrealized_pl = 0 
+        portfolio_data['Unrealized P/L'].append(0)
+        portfolio_data['% Unrealized P/L'].append(0)
         portfolio_data['Realized P/L'].append(realized_pl)
 
         # Log the trade in the statement
