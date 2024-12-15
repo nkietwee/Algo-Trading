@@ -110,7 +110,7 @@ if prev_portfolio_df is not None:
             prev_act_dict[stock_df] = 0
 else:
     prev_act_dict = {stock : 0 for stock in stock_dfs}
-    
+
     # for key, value in prev_act_dict.items():
         # print(f'{key} : {value}')
 
@@ -212,7 +212,6 @@ for index, row in df.iterrows():
         statement_data['Table Name'].append('Statement_file')
         statement_data['File Name'].append(team_name)
         statement_data['Stock Name'].append(stock_name)
-
         statement_data['Date'].append(date)
         statement_data['Time'].append(time)
         statement_data['Side'].append('Buy')
@@ -232,11 +231,12 @@ for index, row in df.iterrows():
         portfolio_data['Market Price'].append(price)
         portfolio_data['Market Value'].append(act_vol * price)
         portfolio_data['Amount Cost'].append(cost)
+
         portfolio_data['Unrealized P/L'].append(0)  # Unrealized P/L is 0 after buy
         portfolio_data['% Unrealized P/L'].append(0)
         portfolio_data['Realized P/L'].append(0)  # No realized P/L for buy
     # Sell condition
-    elif rsi > sell_threshold and act_vol > 0:
+    elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol :
         revenue = price * act_vol
         initial_balance += revenue
         realized_pl = (price - last_price) * act_vol  # Profit from the sale
@@ -254,6 +254,7 @@ for index, row in df.iterrows():
         portfolio_data['Market Price'].append(price)
         portfolio_data['Market Value'].append(0)  # Market value after selling is 0
         portfolio_data['Amount Cost'].append(0)  # No cost after selling
+
         portfolio_data['Unrealized P/L'].append(0)
         portfolio_data['% Unrealized P/L'].append(0)
         portfolio_data['Realized P/L'].append(realized_pl)
