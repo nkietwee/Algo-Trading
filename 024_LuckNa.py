@@ -186,6 +186,8 @@ summary_data = {
 # List of variable trading volumes
 volume_options = [100, 200, 300, 500]
 
+stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0} for stock in stock_dfs}
+
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
@@ -203,10 +205,16 @@ for index, row in df.iterrows():
         cost = price * volume
         initial_balance -= cost
         last_price = price
-
         start_vol = int(prev_act_dict[stock_name]) #act_vol
         act_vol = start_vol + volume
         prev_act_dict[stock_name] = (act_vol)
+
+        stock_totals[stock_name]['total_cost'] += price * volume
+        stock_totals[stock_name]['total_volume'] += volume
+        if stock_totals[stock_name]['total_volume'] == 0:
+            stock_totals[stock_name]['avg_cost'] = 0
+        else:  
+            stock_totals[stock_name]['avg_cost'] = round(stock_totals[stock_name]['total_cost'] / stock_totals[stock_name]['total_volume'], 4)
 
         # Log the trade in the statement
         statement_data['Table Name'].append('Statement_file')
@@ -227,16 +235,17 @@ for index, row in df.iterrows():
         portfolio_data['Start Vol'].append(start_vol)
         portfolio_data['Actual Vol'].append(prev_act_dict[stock_name])
 
-        portfolio_data['Avg Cost'].append(price)
+        portfolio_data['Avg Cost'].append(stock_totals[stock_name]['avg_cost'])
         portfolio_data['Market Price'].append(price)
         portfolio_data['Market Value'].append(act_vol * price)
-        portfolio_data['Amount Cost'].append(cost)
+        portfolio_data['Amount Cost'].append(stock_totals[stock_name]['total_cost'])
 
-        portfolio_data['Unrealized P/L'].append(0)  # Unrealized P/L is 0 after buy
-        portfolio_data['% Unrealized P/L'].append(0)
+# Unrealized P/L=(Market Price−Avg Cost)×Actual Volume
+        portfolio_data['Unrealized P/L'].append(stock_totals[stock_name]['total_cost'] - (act_vol * price))
+        portfolio_data['% Unrealized P/L'].append((stock_totals[stock_name]['total_cost']- (act_vol * price) / (stock_totals[stock_name]['total_cost'])) * 100)
         portfolio_data['Realized P/L'].append(0)  # No realized P/L for buy
     # Sell condition
-    elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol :
+    elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol:
         revenue = price * act_vol
         initial_balance += revenue
         realized_pl = (price - last_price) * act_vol  # Profit from the sale
@@ -244,19 +253,25 @@ for index, row in df.iterrows():
         act_vol = start_vol - volume
         prev_act_dict[stock_name] = (act_vol)
 
+        stock_totals[stock_name]['total_cost'] -= price * volume
+        stock_totals[stock_name]['total_volume'] -= volume
+        if stock_totals[stock_name]['total_volume'] == 0:
+            stock_totals[stock_name]['avg_cost'] = 0
+        else:    
+            stock_totals[stock_name]['avg_cost'] = round(stock_totals[stock_name]['total_cost'] / stock_totals[stock_name]['total_volume'], 4)
         # Update act_vol data for the sell
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
         portfolio_data['Start Vol'].append(start_vol)
         portfolio_data['Actual Vol'].append(prev_act_dict[stock_name])
-        portfolio_data['Avg Cost'].append(last_price)
+        portfolio_data['Avg Cost'].append(stock_totals[stock_name]['avg_cost'])
         portfolio_data['Market Price'].append(price)
-        portfolio_data['Market Value'].append(0)  # Market value after selling is 0
-        portfolio_data['Amount Cost'].append(0)  # No cost after selling
+        portfolio_data['Market Value'].append(act_vol * price)  # Market value after selling is 0
+        portfolio_data['Amount Cost'].append(stock_totals[stock_name]['total_cost'])  # No cost after selling
 
-        portfolio_data['Unrealized P/L'].append(0)
-        portfolio_data['% Unrealized P/L'].append(0)
+        portfolio_data['Unrealized P/L'].append(stock_totals[stock_name]['total_cost']- (act_vol * price))
+        portfolio_data['% Unrealized P/L'].append((stock_totals[stock_name]['total_cost']- (act_vol * price) / (stock_totals[stock_name]['total_cost'])) * 100)
         portfolio_data['Realized P/L'].append(realized_pl)
 
         # Log the trade in the statement
