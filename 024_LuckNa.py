@@ -98,18 +98,21 @@ stock_symbols = ["ADVANC", "AOT", "AWC", "BANPU", "BBL", "BCP", "BDMS", "BEM", "
     "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
 
 
+stock_dfs = df['ShareCode'].unique() # current stock
 # change to numpy array
 if prev_portfolio_df is not None:
     prev_act_dict = {}
     last_rows = prev_portfolio_df.groupby('Stock name')['Actual Vol'].last()
     prev_act_dict = dict(last_rows)
     
-    stock_dfs = df['ShareCode'].unique() # current stock
-
     for stock_df in stock_dfs:
         if stock_df not in prev_act_dict:
             prev_act_dict[stock_df] = 0
-
+else:
+    prev_act_dict = {stock : 0 for stock in stock_dfs}
+    
+    # for key, value in prev_act_dict.items():
+        # print(f'{key} : {value}')
 
 ################################################################################################################################
 
@@ -240,7 +243,7 @@ for index, row in df.iterrows():
         start_vol = int(prev_act_dict[stock_name]) #act_vol
         act_vol = start_vol - volume
         prev_act_dict[stock_name] = (act_vol)
-        
+
         # Update act_vol data for the sell
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
