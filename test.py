@@ -4,11 +4,12 @@ import os
 
 # # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/*.csv")
 # # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
-# # file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-# df = pd.read_csv(file_path)
-
+file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv') 
+df = pd.read_csv(file_path)
+df = df
+print(df)
 # if os.path.exists(file_path):
 #     df = pd.read_csv(file_path)
 #     print(df)
@@ -42,11 +43,11 @@ import os
 # # print(end)
 # print((end - start).days)
 
-import pandas as pd
+# import pandas as pd
 
-# df = pd.read_csv("/home/nkietwee/Desktop/competition_api_new/Previous/summary/024_LuckNa_summary.csv")
-df = pd.read_csv("/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv")
-print(df.head(20))
+# # df = pd.read_csv("/home/nkietwee/Desktop/competition_api_new/Previous/summary/024_LuckNa_summary.csv")
+# df = pd.read_csv("/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv")
+# print(df.head(20))
 
 # def cnt_stock(stock_name):
 #     stock_symbols = ["ADVANC","AOT","AWC","BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH", "BJC",

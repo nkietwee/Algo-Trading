@@ -47,7 +47,7 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241212.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 df = pd.read_csv(file_path)
 
 initial_investment = 10000000 
@@ -154,25 +154,26 @@ statement_data = {
     'Time': [],
     'Side': [],
     'Volume': [],
+    'Actual Vol' : [],
     'Price': [],
     'Amount Cost': [],
-    'End Line available': []
+    'End Line available' : [],
+    # 'Portfolio value' : [], #add
+    'NAV' : []
 }
 
 summary_data = {
     'Table Name': [],
     'File Name': [],
-    'trading_day': [],  
     'NAV': [],
-    'Portfolio value': [],
     'End Line available': [],
+    'Start Line available': [],
     'Number of wins': [], 
     'Number of matched trades': [],
     'Number of transactions:': [],
-    'Net Amount': [],
-    'Unrealized P/L': [],
-    '% Unrealized P/L':[],
-    'Realized P/L': [],
+    'Sum of Unrealized P/L': [],
+    'Sum of %Unrealized P/L':[],
+    'Sum of Realized P/L': [],
     'Maximum value': [],
     'Minimum value': [],
     'Win rate': [],
@@ -216,18 +217,6 @@ for index, row in df.iterrows():
         else:  
             stock_totals[stock_name]['avg_cost'] = round(stock_totals[stock_name]['total_cost'] / stock_totals[stock_name]['total_volume'], 4)
 
-        # Log the trade in the statement
-        statement_data['Table Name'].append('Statement_file')
-        statement_data['File Name'].append(team_name)
-        statement_data['Stock Name'].append(stock_name)
-        statement_data['Date'].append(date)
-        statement_data['Time'].append(time)
-        statement_data['Side'].append('Buy')
-        statement_data['Volume'].append(volume)
-        statement_data['Price'].append(price)
-        statement_data['Amount Cost'].append(cost)
-        statement_data['End Line available'].append(initial_balance)
-
         # Update portfolio data for the buy
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
@@ -248,6 +237,21 @@ for index, row in df.iterrows():
         portfolio_data['Unrealized P/L'].append(unreal)
         portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
         portfolio_data['Realized P/L'].append(0)  # No realized P/L for buy
+
+        # Log the trade in the statement
+        statement_data['Table Name'].append('Statement_file')
+        statement_data['File Name'].append(team_name)
+        statement_data['Stock Name'].append(stock_name)
+        statement_data['Date'].append(date)
+        statement_data['Time'].append(time)
+        statement_data['Side'].append('Buy')
+        statement_data['Volume'].append(volume)
+        statement_data['Actual Vol'].append(prev_act_dict[stock_name])
+        statement_data['Price'].append(price)
+        statement_data['Amount Cost'].append(cost)
+        statement_data['End Line available'].append(initial_balance)
+        # statement_data['Portfolio value'].append() #add
+        statement_data['NAV'].append(float(sum(portfolio_data['Market Value']) + initial_balance))
     # Sell condition
     elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol:
         revenue = price * act_vol
@@ -282,6 +286,7 @@ for index, row in df.iterrows():
         portfolio_data['Unrealized P/L'].append(0)
         portfolio_data['% Unrealized P/L'].append(0)
         portfolio_data['Realized P/L'].append(realized_pl)
+        
 
         # Log the trade in the statement
         statement_data['Table Name'].append('Statement_file')
@@ -291,9 +296,12 @@ for index, row in df.iterrows():
         statement_data['Time'].append(time)
         statement_data['Side'].append('Sell')
         statement_data['Volume'].append(volume)
+        statement_data['Actual Vol'].append(prev_act_dict[stock_name]) 
         statement_data['Price'].append(price)
         statement_data['Amount Cost'].append(revenue)
         statement_data['End Line available'].append(initial_balance)
+        # statement_data['Portfolio value'].append() #add
+        statement_data['NAV'].append(float(sum(portfolio_data['Market Value']) + initial_balance))
 
 # Create DataFrames
 portfolio_df = pd.DataFrame(portfolio_data)
@@ -320,25 +328,25 @@ else:
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
-    'trading_day': [(today - start_day).days],  
+    # 'trading_day': [(today - start_day).days],  
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
-    'Portfolio value': [portfolio_df['Market Value'].sum()],
+    # 'Portfolio value': [portfolio_df['Market Value'].sum()],
     'End Line available': [last_end_line_available],
     'Start Line available':[Start_Line_available],
     'Number of wins': [count_win],
     'Number of matched trades': [count_sell],
     'Number of transactions': [len(statement_df)],
-    'Net Amount': [statement_df['Amount Cost'].sum()],
-    'Unrealized P/L': [portfolio_df['Unrealized P/L'].sum()],
-    '% Unrealized P/L': [(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100) if initial_investment else 0],
-    'Realized P/L': [portfolio_df['Realized P/L'].sum()],
+    # 'Net Amount': [statement_df['Amount Cost'].sum()],
+    'Sum of Unrealized P/L': [portfolio_df['Unrealized P/L'].sum()],
+    'Sum of %Unrealized P/L': [(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100) if initial_investment else 0],
+    'Sum of Realized P/L': [portfolio_df['Realized P/L'].sum()],
     'Maximum value': [statement_df['End Line available'].max()],
     'Minimum value': [statement_df['End Line available'].min()],
     'Win rate': [win_rate],
     'Calmar Ratio': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
                            ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000)],
     'Relative Drawdown': [(portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100],
-    'Maximum Drawdown': [(portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000],
+    'Maximum Drawdown': [(statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max() ],
     '%Return': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100)]
 }
 
