@@ -47,7 +47,7 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241212.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 df = pd.read_csv(file_path)
 
 initial_investment = 10000000 
