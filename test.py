@@ -10,8 +10,8 @@ file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/po
 # df = len(df['Stock name'].unique())
 df = pd.read_csv(file_path)
 # df_first = df.groupby('Stock name').first()
-df_last = df.groupby('Stock name').last()
-print(df_last)
+# df_last = df.groupby('Stock name').last()
+print(len(df))
 # if os.path.exists(file_path):
 #     df = pd.read_csv(file_path)
 #     print(df)

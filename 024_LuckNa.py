@@ -90,14 +90,6 @@ else:
     prev_win_rate = 0
     print(f"Initial initial_balance = initial_investment: {initial_investment}")
 
-stock_symbols = ["ADVANC", "AOT", "AWC", "BANPU", "BBL", "BCP", "BDMS", "BEM", "BGRIM", "BH",
-    "BJC", "BTS", "CBG", "CENTEL", "COM7", "CPALL", "CPF", "CPN", "CRC", "DELTA",
-    "EA", "EGCO", "GLOBAL", "GPSC", "GULF", "HMPRO", "INTUCH", "ITC", "IVL",
-    "JMART", "JMT", "KBANK", "KTB", "KTC", "LH", "MINT", "MTC", "OR", "OSP", "PTT",
-    "PTTEP", "PTTGC", "RATCH", "SAWAD", "SCB", "SCC", "SCGP", "TIDLOR", "TISCO",
-    "TLI", "TOP", "TRUE", "TTB", "TU", "WHA"]
-
-
 stock_dfs = df['ShareCode'].unique() # current stock
 # change to numpy array
 if prev_portfolio_df is not None:
@@ -160,7 +152,7 @@ statement_data = {
     'Price': [],
     'Amount Cost': [],
     'End Line available' : [],
-    'Portfolio value' : [], #add
+    'Portfolio value' : [],
     'NAV' : []
 }
 
@@ -185,12 +177,11 @@ summary_data = {
     '%Return': []
 }
 
-
+# fixes volume
 # List of variable trading volumes
 volume_options = [100, 200, 300, 500]
 
 stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value' : 0, 'sell_volume' : 0} for stock in stock_dfs}
-NAV = 0 
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
@@ -236,7 +227,6 @@ for index, row in df.iterrows():
         stock_totals[stock_name]['Market Value'] += act_vol * price
 
         statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
-
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
     # Sell condition
     elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol:
@@ -274,22 +264,12 @@ for index, row in df.iterrows():
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
 
-# portfolio_df = pd.DataFrame(portfolio_data)
 statement_df = pd.DataFrame(statement_data)
-save_output(statement_df, "statement", team_name)
 
 # Create Portfolio
-df_statement = pd.read_csv(os.path.expanduser("~/Desktop/competition_api/Result/statement/024_LuckNa_statement.csv"))
-statement_lastrows = df_statement.groupby('Stock Name').last()
-df_stock = df_statement['Stock Name'].unique()
+statement_lastrows = statement_df.groupby('Stock Name').last()
+df_stock = statement_lastrows.index.tolist()
 
-# print(df_stock)
-# print(df_statement)
-# print(df_statement['Actual Vol']['AOT'])
-# print(df_statement.iloc[:,6:7])
-
-
-# print(df_statement['Stock Name']['AOT'])
 for stock_name in df_stock:
     portfolio_data['Table Name'].append('Portfolio_file')
     portfolio_data['File Name'].append(team_name)
@@ -314,52 +294,53 @@ for stock_name in df_stock:
     portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
     portfolio_data['Realized P/L'].append(realized_pl)
 
+portfolio_df = pd.DataFrame(portfolio_data)
 
-# start_day  = datetime(2024, 12, 10)
-# today  = datetime.now()
+start_day  = datetime(2024, 12, 10)
+today  = datetime.now()
 
-# last_end_line_available = initial_balance
-# if statement_df is not None:
-#     count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
-#     count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
-#     if count_sell == 0:
-#         win_rate = prev_win_rate
-#     else:
-#         win_rate = (count_win * 100) / count_sell
-# else:
-#     count_win = 0
-#     count_sell = 0
-#     win_rate = 0
+last_end_line_available = initial_balance
+if statement_df is not None:
+    count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
+    count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
+    if count_sell == 0:
+        win_rate = prev_win_rate
+    else:
+        win_rate = (count_win * 100) / count_sell
+else:
+    count_win = 0
+    count_sell = 0
+    win_rate = 0
 
-# summary_data = {
-#     'Table Name': ['Sum_file'],
-#     'File Name': [team_name],
-#     'trading_day': [(today - start_day).days],  
-#     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
-#     'Portfolio value': [portfolio_df['Market Value'].sum()],
-#     'End Line available': [last_end_line_available],
-#     'Start Line available':[Start_Line_available],
-#     'Number of wins': [count_win],
-#     'Number of matched trades': [count_sell],
-#     'Number of transactions': [len(statement_df)],
-#     'Net Amount': [statement_df['Amount Cost'].sum()],
-#     'Sum of Unrealized P/L': [portfolio_df['Unrealized P/L'].sum()],
-#     'Sum of %Unrealized P/L': [(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100) if initial_investment else 0],
-#     'Sum of Realized P/L': [portfolio_df['Realized P/L'].sum()],
-#     'Maximum value': [statement_df['End Line available'].max()],
-#     'Minimum value': [statement_df['End Line available'].min()],
-#     'Win rate': [win_rate],
-#     'Calmar Ratio': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
-#                            ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000)],
-#     'Relative Drawdown': [(portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100],
-#     'Maximum Drawdown': [(statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max() ],
-#     '%Return': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100)]
-# }
+summary_data = {
+    'Table Name': ['Sum_file'],
+    'File Name': [team_name],
+    'trading_day': [(today - start_day).days],  
+    'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
+    'Portfolio value': [portfolio_df['Market Value'].sum()],
+    'End Line available': [last_end_line_available],
+    'Start Line available':[Start_Line_available],
+    'Number of wins': [count_win],
+    'Number of matched trades': [count_sell],
+    'Number of transactions': [len(statement_df)],
+    'Net Amount': [statement_df['Amount Cost'].sum()],
+    'Sum of Unrealized P/L': [portfolio_df['Unrealized P/L'].sum()],
+    'Sum of %Unrealized P/L': [(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100) if initial_investment else 0],
+    'Sum of Realized P/L': [portfolio_df['Realized P/L'].sum()],
+    'Maximum value': [statement_df['End Line available'].max()],
+    'Minimum value': [statement_df['End Line available'].min()],
+    'Win rate': [win_rate],
+    'Calmar Ratio': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
+                           ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000)],
+    'Relative Drawdown': [(portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100],
+    'Maximum Drawdown': [(statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max() ],
+    '%Return': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100)]
+}
 
 
-# summary_df = pd.DataFrame(summary_data)
+summary_df = pd.DataFrame(summary_data)
 
 # # Save outputs
-# save_output(portfolio_df, "portfolio", team_name)
-# # save_output(statement_df, "statement", team_name)
-# save_output(summary_df, "summary", team_name)
+save_output(portfolio_df, "portfolio", team_name)
+save_output(statement_df, "statement", team_name)
+save_output(summary_df, "summary", team_name)
