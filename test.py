@@ -7,9 +7,11 @@ import os
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
 
 file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv') 
+# df = len(df['Stock name'].unique())
 df = pd.read_csv(file_path)
-df = df
-print(df)
+# df_first = df.groupby('Stock name').first()
+df_last = df.groupby('Stock name').last()
+print(df_last)
 # if os.path.exists(file_path):
 #     df = pd.read_csv(file_path)
 #     print(df)
