@@ -47,7 +47,8 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv') 
 df = pd.read_csv(file_path)
 
 initial_investment = 10000000 
@@ -105,7 +106,7 @@ if prev_portfolio_df is not None:
             start_dict[stock_df] = 0
 else: #in case don't have portfolio
     prev_act_dict = {stock : 0 for stock in stock_dfs}
-
+    start_dict = {stock : 0 for stock in stock_dfs}
     # for key, value in prev_act_dict.items():
         # print(f'{key} : {value}')
 
