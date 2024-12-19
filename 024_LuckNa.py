@@ -47,8 +47,8 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 df = pd.read_csv(file_path)
 
 initial_investment = 10000000 
@@ -184,6 +184,10 @@ summary_data = {
 volume_options = [100, 200, 300, 500]
 
 stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value' : 0, 'sell_volume' : 0} for stock in stock_dfs}
+
+df['TradeDateTime'] = pd.to_datetime(df['TradeDateTime'])  # แปลงเป็น datetime
+# Sort DailyTick by TradeDateTime
+df = df.sort_values(by='TradeDateTime')
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
@@ -192,8 +196,8 @@ for index, row in df.iterrows():
     date_time = row['TradeDateTime']
 
     # Split date and time
-    date = date_time.split()[0]
-    time = date_time.split()[1]
+    date = date_time.date()
+    time = date_time.time()
 
     volume = np.random.choice(volume_options)
     # Buy condition
@@ -216,8 +220,8 @@ for index, row in df.iterrows():
         statement_data['Table Name'].append('Statement_file')
         statement_data['File Name'].append(team_name)
         statement_data['Stock Name'].append(stock_name)
-        statement_data['Date'].append(date)
-        statement_data['Time'].append(time)
+        statement_data['Date'].append(str(date))
+        statement_data['Time'].append(str(time))
         statement_data['Side'].append('Buy')
         statement_data['Volume'].append(volume)
         statement_data['Actual Vol'].append(prev_act_dict[stock_name])
@@ -250,8 +254,8 @@ for index, row in df.iterrows():
         statement_data['Table Name'].append('Statement_file')
         statement_data['File Name'].append(team_name)
         statement_data['Stock Name'].append(stock_name)
-        statement_data['Date'].append(date)
-        statement_data['Time'].append(time)
+        statement_data['Date'].append(str(date))
+        statement_data['Time'].append(str(time))
         statement_data['Side'].append('Sell')
         statement_data['Volume'].append(volume)
         statement_data['Actual Vol'].append(prev_act_dict[stock_name]) 
@@ -267,6 +271,8 @@ for index, row in df.iterrows():
 
 
 statement_df = pd.DataFrame(statement_data)
+statement_df['DateTime'] = pd.to_datetime(statement_df['Date'].astype(str)  + " " + statement_df['Time'].astype(str) )
+statement_df = statement_df.sort_values(by='DateTime')
 
 # Create Portfolio
 statement_lastrows = statement_df.groupby('Stock Name').last()
