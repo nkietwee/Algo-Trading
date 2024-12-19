@@ -198,7 +198,7 @@ for index, row in df.iterrows():
 
     # Split date and time
     date = date_time.split()[0]
-    time = date_time.split()[1]
+    timee = date_time.split()[1]
 
     volume = np.random.choice(volume_options)
     # Buy condition
@@ -222,7 +222,7 @@ for index, row in df.iterrows():
         statement_data['File Name'].append(team_name)
         statement_data['Stock Name'].append(stock_name)
         statement_data['Date'].append(date)
-        statement_data['Time'].append(time)
+        statement_data['Time'].append(timee)
         statement_data['Side'].append('Buy')
         statement_data['Volume'].append(volume)
         statement_data['Actual Vol'].append(prev_act_dict[stock_name])
@@ -256,7 +256,7 @@ for index, row in df.iterrows():
         statement_data['File Name'].append(team_name)
         statement_data['Stock Name'].append(stock_name)
         statement_data['Date'].append(date)
-        statement_data['Time'].append(time)
+        statement_data['Time'].append(timee)
         statement_data['Side'].append('Sell')
         statement_data['Volume'].append(volume)
         statement_data['Actual Vol'].append(prev_act_dict[stock_name]) 
@@ -272,8 +272,7 @@ for index, row in df.iterrows():
 
 
 statement_df = pd.DataFrame(statement_data)
-# statement_df['DateTime'] = pd.to_datetime(statement_df['Date'].astype(str)  + " " + statement_df['Time'].astype(str) )
-# statement_df = statement_df.sort_values(by='DateTime')
+statement_df = statement_df.sort_values('Time')
 
 # Create Portfolio
 statement_lastrows = statement_df.groupby('Stock Name').last()
