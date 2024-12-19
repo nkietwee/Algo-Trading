@@ -94,6 +94,7 @@ stock_dfs = df['ShareCode'].unique() # current stock
 # change to numpy array
 if prev_portfolio_df is not None:
     prev_act_dict = {}
+    start_dict = {}
     last_rows = prev_portfolio_df.groupby('Stock name')['Actual Vol'].last()
     prev_act_dict = dict(last_rows)
     start_dict = dict(last_rows)
@@ -118,7 +119,7 @@ df['RSI'] = RSIIndicator(close=df['LastPrice'], window=rsi_period).rsi()
 buy_threshold = 30
 sell_threshold = 70
 
-# Initialize trading variables
+# Initialize trading variable
 initial_balance = initial_investment
 act_vol = 0  # Shares held
 start_vol = 0
