@@ -47,8 +47,8 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 df = pd.read_csv(file_path)
 
@@ -203,7 +203,7 @@ for index, row in df.iterrows():
     volume = np.random.choice(volume_options)
 
     # act_vol = 0
-    
+
     # Buy condition
     if rsi < buy_threshold and initial_balance >= price * volume:
         cost = price * volume
