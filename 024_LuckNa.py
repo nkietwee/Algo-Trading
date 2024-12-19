@@ -201,6 +201,9 @@ for index, row in df.iterrows():
     timee = date_time.split()[1]
 
     volume = np.random.choice(volume_options)
+
+    # act_vol = 0
+    
     # Buy condition
     if rsi < buy_threshold and initial_balance >= price * volume:
         cost = price * volume
@@ -267,8 +270,11 @@ for index, row in df.iterrows():
         stock_totals[stock_name]['Market Value'] += act_vol * price
         stock_totals[stock_name]['sell_volume'] += volume
         
-        statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value']) #add
+        statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
+
+    if initial_balance <= 2000000:
+        break
 
 
 statement_df = pd.DataFrame(statement_data)

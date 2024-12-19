@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 # # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/*.csv")
-# # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
 
 file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv') 
@@ -11,7 +11,7 @@ file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/po
 df = pd.read_csv(file_path)
 # df_first = df.groupby('Stock name').first()
 # df_last = df.groupby('Stock name').last()
-print(len(df))
+print(df.head(10))
 # if os.path.exists(file_path):
 #     df = pd.read_csv(file_path)
 #     print(df)
