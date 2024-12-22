@@ -47,8 +47,8 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 df = pd.read_csv(file_path)
 
@@ -239,7 +239,7 @@ for index, row in df.iterrows():
         statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
     # Sell condition
-    elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol:
+    elif rsi > sell_threshold and prev_act_dict[stock_name] > 0 and volume <= prev_act_dict[stock_name]:
         revenue = price * act_vol
         initial_balance += revenue
         realized_pl = (price - last_price) * act_vol  # Profit from the sale
