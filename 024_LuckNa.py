@@ -249,7 +249,7 @@ for index, row in df.iterrows():
         act_vol = start_vol - volume
         prev_act_dict[stock_name] = (act_vol)
 
-        stock_totals[stock_name]['total_cost'] -= price * volume
+        stock_totals[stock_name]['total_cost'] -= volume * stock_totals[stock_name]['avg_cost']
         stock_totals[stock_name]['total_volume'] -= volume
         if stock_totals[stock_name]['total_volume'] == 0:
             stock_totals[stock_name]['avg_cost'] = 0
@@ -286,31 +286,33 @@ statement_lastrows = statement_df.groupby('Stock Name').last()
 df_stock = statement_lastrows.index.tolist()
 
 for stock_name in df_stock:
-    portfolio_data['Table Name'].append('Portfolio_file')
-    portfolio_data['File Name'].append(team_name)
-    portfolio_data['Stock name'].append(stock_name)
-    portfolio_data['Start Vol'].append(int(start_dict[stock_name]))
-    portfolio_data['Actual Vol'].append(statement_lastrows['Actual Vol'][stock_name])
-    portfolio_data['Avg Cost'].append(stock_totals[stock_name]['avg_cost'])
-    portfolio_data['Market Price'].append(statement_lastrows['Price'][stock_name])
-    portfolio_data['Market Value'].append(statement_lastrows['Price'][stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
-    portfolio_data['Amount Cost'].append(stock_totals[stock_name]['total_cost'])  # No cost after selling
-    realized_pl = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
-   
-    unreal =  portfolio_data['Market Value'][0] - stock_totals[stock_name]['total_cost']
-    if stock_totals[stock_name]['total_cost'] == 0:
-        percent_unrealized_pl = 0
-    else:
-        percent_unrealized_pl = (unreal / stock_totals[stock_name]['total_cost']) * 100
+    # if portfolio_data['Actual Vol']:
+    if statement_lastrows['Actual Vol'][stock_name] != 0 :
+        portfolio_data['Table Name'].append('Portfolio_file')
+        portfolio_data['File Name'].append(team_name)
+        portfolio_data['Stock name'].append(stock_name)
+        portfolio_data['Start Vol'].append(int(start_dict[stock_name]))
+        portfolio_data['Actual Vol'].append(statement_lastrows['Actual Vol'][stock_name])
+        portfolio_data['Avg Cost'].append(stock_totals[stock_name]['avg_cost'])
+        portfolio_data['Market Price'].append(statement_lastrows['Price'][stock_name])
+        portfolio_data['Market Value'].append(statement_lastrows['Price'][stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
+        portfolio_data['Amount Cost'].append(round(stock_totals[stock_name]['total_cost'], 4))  # No cost after selling
+        realized_pl = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
+    
+        unreal =  portfolio_data['Market Value'][0] - stock_totals[stock_name]['total_cost']
+        if stock_totals[stock_name]['total_cost'] == 0:
+            percent_unrealized_pl = 0
+        else:
+            percent_unrealized_pl = (unreal / stock_totals[stock_name]['total_cost']) * 100
 
-    if stock_totals[stock_name]['sell_volume'] == 0 :
-        realized_pl = 0
-    else:
-        realized_pl =  portfolio_data['Market Value'][0] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
+        if stock_totals[stock_name]['sell_volume'] == 0:
+            realized_pl = 0
+        else:
+            realized_pl =  portfolio_data['Market Value'][0] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
 
-    portfolio_data['Unrealized P/L'].append(unreal)
-    portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
-    portfolio_data['Realized P/L'].append(realized_pl)
+        portfolio_data['Unrealized P/L'].append(unreal)
+        portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
+        portfolio_data['Realized P/L'].append(realized_pl)
 
 portfolio_df = pd.DataFrame(portfolio_data)
 
