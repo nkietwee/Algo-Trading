@@ -203,6 +203,7 @@ for index, row in df.iterrows():
     timee = date_time.time()
 
     volume = np.random.choice(volume_options)
+    # volume = 100
 
     # Buy condition
     if rsi < buy_threshold and initial_balance >= price * volume:
@@ -240,11 +241,9 @@ for index, row in df.iterrows():
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
     # Sell condition
-    # elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol:
     elif rsi > sell_threshold and prev_act_dict[stock_name] > 0 and volume <= prev_act_dict[stock_name]:
-        revenue = price * act_vol
+        revenue = price * volume
         initial_balance += revenue
-        realized_pl = (price - last_price) * act_vol  # Profit from the sale
         start_vol = int(prev_act_dict[stock_name]) #act_vol
         act_vol = start_vol - volume
         prev_act_dict[stock_name] = (act_vol)
@@ -298,8 +297,14 @@ for stock_name in df_stock:
         portfolio_data['Market Value'].append(statement_lastrows['Price'][stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
         portfolio_data['Amount Cost'].append(round(stock_totals[stock_name]['total_cost'], 4))  # No cost after selling
         realized_pl = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
-    
-        unreal =  portfolio_data['Market Value'][0] - stock_totals[stock_name]['total_cost']
+        
+        # print(f"value : {float(portfolio_data['Market Value'][0])}")
+        # print(f"value : {portfolio_data['Market Value'][0]}")
+        # print(f"value : {portfolio_data['Market Value'][-1]}")
+        # exit(0)
+
+        # unreal =  portfolio_data['Market Value'][0] - stock_totals[stock_name]['total_cost'] # current - buy
+        unreal =  portfolio_data['Market Value'][-1] - stock_totals[stock_name]['total_cost'] # current - buy
         if stock_totals[stock_name]['total_cost'] == 0:
             percent_unrealized_pl = 0
         else:
@@ -308,13 +313,16 @@ for stock_name in df_stock:
         if stock_totals[stock_name]['sell_volume'] == 0:
             realized_pl = 0
         else:
-            realized_pl =  portfolio_data['Market Value'][0] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
+            realized_pl =  portfolio_data['Market Value'][-1] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
+            # realized_pl =  portfolio_data['Market Value'][0] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
 
         portfolio_data['Unrealized P/L'].append(unreal)
         portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
         portfolio_data['Realized P/L'].append(realized_pl)
 
 portfolio_df = pd.DataFrame(portfolio_data)
+
+
 
 start_day  = datetime(2024, 12, 10)
 today  = datetime.now()
@@ -357,7 +365,7 @@ summary_data = {
     '%Return': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100)]
 }
 
-
+# Maximum Drawdown = ((Minimum Value − Maximum Value) / Maximum Value)*100
 summary_df = pd.DataFrame(summary_data)
 
 # # Save outputs
