@@ -48,8 +48,8 @@ def save_output(data, file_type, teamName):
 statements = []
 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 
 df = pd.read_csv(file_path)
 
@@ -82,7 +82,7 @@ if prev_summary_df is not None:
                 prev_win_rate = prev_summary_df['Win rate'][0]
                 # print(f'pre_win_rate : {prev_win_rate}')
                 print("End Line available column loaded successfully.")
-                print(f"Initial initial_balance (first value): {initial_balance}")
+                print(f"Initial balance (first value): {initial_balance}")
             except ValueError:
                 print(f"Error converting '{first_value}' to a float.")
                 initial_balance = initial_investment  # ใช้ค่าตั้งต้นในกรณีเกิดข้อผิดพลาด
@@ -96,7 +96,7 @@ else:
     initial_balance = initial_investment  # ใช้ค่าตั้งต้นหากไฟล์ไม่โหลด
     Start_Line_available = initial_investment
     prev_win_rate = 0
-    print(f"Initial initial_balance = initial_investment: {initial_investment}")
+    print(f"Initial balance = initial_investment: {initial_investment}")
 
 stock_dfs = df['ShareCode'].unique() # current stock
 # change to numpy array
@@ -191,7 +191,6 @@ volume_options = [100, 200, 300, 500]
 
 stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value' : 0, 'sell_volume' : 0} for stock in stock_dfs}
 
-print(f'before initial : {initial_balance:,d}')
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
@@ -276,7 +275,7 @@ for index, row in df.iterrows():
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
     if initial_balance <= 2500000:
-        print("keep money")
+        # print("keep money")
         break
 
 
@@ -320,8 +319,6 @@ start_day  = datetime(2024, 12, 10)
 today  = datetime.now()
 
 last_end_line_available = initial_balance
-print(f'initial balance : {initial_balance:,f}')
-print(f'last_end_line : {last_end_line_available:,f}')
 if statement_df is not None:
     count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
     count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
