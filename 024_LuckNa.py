@@ -220,9 +220,6 @@ for index, row in df.iterrows():
         else:  
             stock_totals[stock_name]['avg_cost'] = round(stock_totals[stock_name]['total_cost'] / stock_totals[stock_name]['total_volume'], 4)
 
-        # print(f'cost : {cost}')
-        # print(f'initial balance : {initial_balance}')
-        # exit(0)
         # Log the trade in the statement
         statement_data['Table Name'].append('Statement_file')
         statement_data['File Name'].append(team_name)
@@ -242,10 +239,6 @@ for index, row in df.iterrows():
         statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
-        # print(f'cost : {cost}')
-        # print(f'initial balance : {initial_balance}')
-        # print(f'statement : {int(statement_data['End Line available'])}')
-        # exit(0)
     # Sell condition
     # elif rsi > sell_threshold and act_vol > 0 and volume <= act_vol:
     elif rsi > sell_threshold and prev_act_dict[stock_name] > 0 and volume <= prev_act_dict[stock_name]:
@@ -287,21 +280,6 @@ for index, row in df.iterrows():
 
 
 statement_df = pd.DataFrame(statement_data)
-# save_output(statement_df, "statement_nosort", team_name)
-# statement_df['Time'] = pd.to_datetime(statement_df['Time'])
-# statement_df['Times'] = statement_df['Time'].dt.strftime('%H:%M:%S')
-# print(statement_df['Time'][0])
-# print(type(statement_df['Time'][0]))
-# print(statement_df.head(20))
-# statement_df['Time'] = pd.to_datetime(statement_df['Time'], format='%H:%M:%S').dt.time
-# statement_df = statement_df.sort_values(by='Time')
-# save_output(statement_df, "statement_sort", team_name)
-# print(statement_df['Time'][0])
-# print(type(statement_df['Time'][0]))
-# print(statement_df.head(20))
-
-# exit(0)
-# statement_df = statement_df.sort_values('FormattedTime')
 
 # Create Portfolio
 statement_lastrows = statement_df.groupby('Stock Name').last()
