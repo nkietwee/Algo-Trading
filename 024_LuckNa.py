@@ -48,8 +48,8 @@ def save_output(data, file_type, teamName):
 statements = []
 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 
 df = pd.read_csv(file_path)
 
@@ -186,12 +186,12 @@ summary_data = {
     '%Return': []
 }
 
-# fixes volume
 # List of variable trading volumes
 volume_options = [100, 200, 300, 500]
 
 stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value' : 0, 'sell_volume' : 0} for stock in stock_dfs}
 
+print(f'before initial : {initial_balance:,d}')
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
@@ -206,6 +206,7 @@ for index, row in df.iterrows():
     # volume = 100
 
     # Buy condition
+    # if rsi < buy_threshold and initial_balance >= price * volume and stock_totals[stock_name]['buy_state'] == 0:
     if rsi < buy_threshold and initial_balance >= price * volume:
         cost = price * volume
         initial_balance -= cost
@@ -239,8 +240,8 @@ for index, row in df.iterrows():
 
         statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
-
     # Sell condition
+    # Don't forget to cut loss
     elif rsi > sell_threshold and prev_act_dict[stock_name] > 0 and volume <= prev_act_dict[stock_name]:
         revenue = price * volume
         initial_balance += revenue
@@ -274,7 +275,8 @@ for index, row in df.iterrows():
         statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
-    if initial_balance <= 2000000:
+    if initial_balance <= 2500000:
+        print("keep money")
         break
 
 
@@ -285,7 +287,6 @@ statement_lastrows = statement_df.groupby('Stock Name').last()
 df_stock = statement_lastrows.index.tolist()
 
 for stock_name in df_stock:
-    # if portfolio_data['Actual Vol']:
     if statement_lastrows['Actual Vol'][stock_name] != 0 :
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
@@ -298,12 +299,6 @@ for stock_name in df_stock:
         portfolio_data['Amount Cost'].append(round(stock_totals[stock_name]['total_cost'], 4))  # No cost after selling
         realized_pl = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
         
-        # print(f"value : {float(portfolio_data['Market Value'][0])}")
-        # print(f"value : {portfolio_data['Market Value'][0]}")
-        # print(f"value : {portfolio_data['Market Value'][-1]}")
-        # exit(0)
-
-        # unreal =  portfolio_data['Market Value'][0] - stock_totals[stock_name]['total_cost'] # current - buy
         unreal =  portfolio_data['Market Value'][-1] - stock_totals[stock_name]['total_cost'] # current - buy
         if stock_totals[stock_name]['total_cost'] == 0:
             percent_unrealized_pl = 0
@@ -314,7 +309,6 @@ for stock_name in df_stock:
             realized_pl = 0
         else:
             realized_pl =  portfolio_data['Market Value'][-1] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
-            # realized_pl =  portfolio_data['Market Value'][0] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
 
         portfolio_data['Unrealized P/L'].append(unreal)
         portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
@@ -322,12 +316,12 @@ for stock_name in df_stock:
 
 portfolio_df = pd.DataFrame(portfolio_data)
 
-
-
 start_day  = datetime(2024, 12, 10)
 today  = datetime.now()
 
 last_end_line_available = initial_balance
+print(f'initial balance : {initial_balance:,f}')
+print(f'last_end_line : {last_end_line_available:,f}')
 if statement_df is not None:
     count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
     count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
