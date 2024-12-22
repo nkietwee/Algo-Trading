@@ -7,13 +7,16 @@ import os
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
 
 # file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv') 
-file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/statement/024_LuckNa_statement.csv') 
+# file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/statement/024_LuckNa_statement.csv') 
+# file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv') 
+
 # df = len(df['Stock name'].unique())
-df = pd.read_csv(file_path)
-# df = df[['Actual Vol'] < 0]
-# df_first = df.groupby('Stock name').first()
-# df_last = df.groupby('Stock name').last()
-print(df.head(10))
+# df = pd.read_csv(file_path)
+
+# df = df[df['Actual Vol'] < 0]
+# df = df.tail()
+
+# print(df.head(100))
 # if os.path.exists(file_path):
 #     df = pd.read_csv(file_path)
 #     print(df)
@@ -81,3 +84,50 @@ print(df.head(10))
 
 # lst = cnt_stock("WHA", 0 , 400)
 # print(lst)
+
+import pandas as pd
+
+# df = pd.DataFrame({'date': ['2022-06-01 12:00:00', '2022-06-02 13:00:00', '2022-06-03 14:00:00']})
+df = pd.DataFrame({'date' : ['2024-12-18 09:55:51']})
+# convert the date column to datetime format
+# print(type(df))
+df['date'] = pd.to_datetime(df['date'])
+
+# change the datetime format
+# df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+# df['date'] = pd.to_datetime(df['date'],  format='%Y-%m-%d %H:%M:%S.%f').dt.time
+
+# print(type(df['date'][0]))
+date = df['date'].date
+timee = df['date'].time
+print(date)
+print(timee)
+
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/*.csv")
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
+
+# file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv') 
+# file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/statement/024_LuckNa_statement.csv') 
+# file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv') 
+
+# df = pd.read_csv(file_path)
+
+# df = df[df['Actual Vol'] < 0]
+# df = df.tail()
+
+# print(df.head(100))
+
+# import pandas as pd
+
+# # create a DataFrame with datetime data
+# df = pd.DataFrame({'date': ['2022-06-01 12:00:00', '2022-06-02 13:00:00', '2022-06-03 14:00:00']})
+
+# # convert the date column to datetime format
+# df['date'] = pd.to_datetime(df['date'])
+
+# # change the datetime format
+# df['date'] = df['date'].dt.strftime('%Y/%m/%d %H:%M:%S')
+
+# print(type(df['date'][0]))
+# print(df)
