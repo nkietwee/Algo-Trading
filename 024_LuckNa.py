@@ -47,9 +47,9 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 
 df = pd.read_csv(file_path)
@@ -325,7 +325,7 @@ for stock_name in df_stock:
 
         portfolio_data['Unrealized P/L'].append(round(unreal, 4))
         portfolio_data['% Unrealized P/L'].append(round(percent_unrealized_pl, 4))
-        portfolio_data['Realized P/L'].append(realized_pl)
+        portfolio_data['Realized P/L'].append(round(realized_pl, 4))
 
 if prev_portfolio_df is not None:
     for key, value in prev_portfolio_df.iterrows():
@@ -395,7 +395,7 @@ def getday():
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
-    'trading_day': [getday()],  
+    'trading_day': [getday()],
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
     'End Line available': [last_end_line_available],
@@ -404,17 +404,17 @@ summary_data = {
     'Number of matched trades': [count_sell],
     'Number of transactions': [len(statement_df)],
     'Net Amount': [statement_df['Amount Cost'].sum()],
-    'Sum of Unrealized P/L': [portfolio_df['Unrealized P/L'].sum()],
-    'Sum of %Unrealized P/L': [(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100) if initial_investment else 0],
-    'Sum of Realized P/L': [portfolio_df['Realized P/L'].sum()],
+    'Sum of Unrealized P/L': [round(portfolio_df['Unrealized P/L'].sum(), 4)],
+    'Sum of %Unrealized P/L': [round(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100, 4) if initial_investment else 0],
+    'Sum of Realized P/L': [round(portfolio_df['Realized P/L'].sum(), 4)],
     'Maximum value': [statement_df['End Line available'].max()],
     'Minimum value': [statement_df['End Line available'].min()],
-    'Win rate': [win_rate],
-    'Calmar Ratio': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
-                           ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000)],
-    'Relative Drawdown': [(portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100],
-    'Maximum Drawdown': [(statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max() ],
-    '%Return': [((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100)]
+    'Win rate': [round(win_rate, 4)],
+    'Calmar Ratio': [round(((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
+                           ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000), 4)] ,
+    'Relative Drawdown': [round((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100, 4)],
+    'Maximum Drawdown': [round((statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max(), 4) ],
+    '%Return': [round((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100, 4)]
 }
 
 # Maximum Drawdown = ((Minimum Value − Maximum Value) / Maximum Value)*100
