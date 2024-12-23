@@ -47,12 +47,13 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 
 df = pd.read_csv(file_path)
-
+last_price = df.groupby('ShareCode').last()['LastPrice']
+# print(last_price)
 # sort value
 df['TradeDateTime'] = pd.to_datetime(df['TradeDateTime'])
 # print(df.head())
@@ -131,7 +132,6 @@ sell_threshold = 70
 initial_balance = initial_investment
 act_vol = 0  # Shares held
 start_vol = 0
-last_price = 0
 
 # Dictionaries for portfolio and statement
 portfolio_data = {
@@ -209,7 +209,6 @@ for index, row in df.iterrows():
     if rsi < buy_threshold and initial_balance >= price * volume:
         cost = price * volume
         initial_balance -= cost
-        last_price = price
         start_vol = int(prev_act_dict[stock_name]) #act_vol
         act_vol = start_vol + volume
         prev_act_dict[stock_name] = (act_vol)
@@ -235,10 +234,20 @@ for index, row in df.iterrows():
         statement_data['End Line available'].append(initial_balance)
         
         # for use in portfolio
-        stock_totals[stock_name]['Market Value'] += act_vol * price
+        stock_totals[stock_name]['Market Value'] = act_vol * price
+        # sum_market = 0 
+        # for key, value in stock_totals.items():
+        #     if key:
+        #         sum_market += float(value['Market Value'])
 
+
+        # statement_data['Portfolio value'].append(sum_market)
+        # statement_data['NAV'].append(sum_market + initial_balance)
+        
         statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
+
+
     # Sell condition
     # Don't forget to cut loss
     elif rsi > sell_threshold and prev_act_dict[stock_name] > 0 and volume <= prev_act_dict[stock_name]:
@@ -268,9 +277,16 @@ for index, row in df.iterrows():
         statement_data['Amount Cost'].append(revenue)
         statement_data['End Line available'].append(initial_balance)
 
-        stock_totals[stock_name]['Market Value'] += act_vol * price
+        stock_totals[stock_name]['Market Value'] = act_vol * price
         stock_totals[stock_name]['sell_volume'] += volume
         
+        # sum_market = 0 
+        # for key, value in stock_totals.items():
+        #     if key:
+        #         sum_market += float(value['Market Value'])
+        # statement_data['Portfolio value'].append(sum_market)
+        # statement_data['NAV'].append(sum_market + initial_balance)
+
         statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
@@ -293,8 +309,10 @@ for stock_name in df_stock:
         portfolio_data['Start Vol'].append(int(start_dict[stock_name]))
         portfolio_data['Actual Vol'].append(statement_lastrows['Actual Vol'][stock_name])
         portfolio_data['Avg Cost'].append(stock_totals[stock_name]['avg_cost'])
-        portfolio_data['Market Price'].append(statement_lastrows['Price'][stock_name])
-        portfolio_data['Market Value'].append(statement_lastrows['Price'][stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
+        portfolio_data['Market Price'].append(last_price[stock_name])
+        # portfolio_data['Market Price'].append(statement_lastrows['Price'][stock_name])
+        portfolio_data['Market Value'].append(last_price[stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
+        # portfolio_data['Market Value'].append(statement_lastrows['Price'][stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
         portfolio_data['Amount Cost'].append(round(stock_totals[stock_name]['total_cost'], 4))  # No cost after selling
         realized_pl = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
         
@@ -343,11 +361,16 @@ def getday():
         day_no = tmp_day - 4
     return (day_no)
 
+# for key, value in stock_totals.items():
+#     print(f'{key} : {value}')
+# print(stock_totals)
+
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
     'trading_day': [getday()],  
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
+    # 'Portfolio value': [portfolio_df['Market Value'].sum()],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
     'End Line available': [last_end_line_available],
     'Start Line available':[Start_Line_available],
