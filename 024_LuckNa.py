@@ -67,9 +67,6 @@ prev_summary_df = load_previous("summary", team_name)
 # prev_statement_df = load_previous("statement", team_name)
 prev_portfolio_df = load_previous("portfolio", team_name)
 
-stock_previous = prev_portfolio_df['Stock name'].unique()
-# print(stock_previous)
-# print(len(stock_previous))
 
 # print(prev_portfolio_df)
 if prev_summary_df is not None:
