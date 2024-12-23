@@ -47,11 +47,9 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 
 df = pd.read_csv(file_path)
