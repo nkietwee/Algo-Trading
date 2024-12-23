@@ -47,8 +47,8 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 
 df = pd.read_csv(file_path)
@@ -315,8 +315,6 @@ for stock_name in df_stock:
 
 portfolio_df = pd.DataFrame(portfolio_data)
 
-start_day  = datetime(2024, 12, 10)
-today  = datetime.now()
 
 last_end_line_available = initial_balance
 if statement_df is not None:
@@ -331,10 +329,24 @@ else:
     count_sell = 0
     win_rate = 0
 
+def getday():
+    start_day  = datetime(2024, 12, 23)
+    # today  = datetime(2025, 1, 9)
+    today  = datetime.now()
+    tmp_day = (today - start_day).days
+    day_no = 0
+    if (tmp_day < 7):
+        day_no = tmp_day
+    elif (tmp_day >= 7 and tmp_day <= 11):
+        day_no = tmp_day - 2
+    elif tmp_day >= 14 and tmp_day <= 18:
+        day_no = tmp_day - 4
+    return (day_no)
+
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
-    'trading_day': [(today - start_day).days],  
+    'trading_day': [getday()],  
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
     'End Line available': [last_end_line_available],

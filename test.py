@@ -85,23 +85,23 @@ import os
 # lst = cnt_stock("WHA", 0 , 400)
 # print(lst)
 
-import pandas as pd
+# import pandas as pd
 
-# df = pd.DataFrame({'date': ['2022-06-01 12:00:00', '2022-06-02 13:00:00', '2022-06-03 14:00:00']})
-df = pd.DataFrame({'date' : ['2024-12-18 09:55:51']})
-# convert the date column to datetime format
-# print(type(df))
-df['date'] = pd.to_datetime(df['date'])
+# # df = pd.DataFrame({'date': ['2022-06-01 12:00:00', '2022-06-02 13:00:00', '2022-06-03 14:00:00']})
+# df = pd.DataFrame({'date' : ['2024-12-18 09:55:51']})
+# # convert the date column to datetime format
+# # print(type(df))
+# df['date'] = pd.to_datetime(df['date'])
 
-# change the datetime format
-# df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
-# df['date'] = pd.to_datetime(df['date'],  format='%Y-%m-%d %H:%M:%S.%f').dt.time
+# # change the datetime format
+# # df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+# # df['date'] = pd.to_datetime(df['date'],  format='%Y-%m-%d %H:%M:%S.%f').dt.time
 
-# print(type(df['date'][0]))
-date = df['date'].date
-timee = df['date'].time
-print(date)
-print(timee)
+# # print(type(df['date'][0]))
+# date = df['date'].date
+# timee = df['date'].time
+# print(date)
+# print(timee)
 
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/*.csv")
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
@@ -131,3 +131,34 @@ print(timee)
 
 # print(type(df['date'][0]))
 # print(df)
+from datetime import datetime, timedelta
+from datetime import time
+
+start_day  = datetime(2024, 12, 23)
+# today  = datetime.now()
+today  = datetime(2025, 1, 10)
+
+day_no = 0
+tmp_day = (today - start_day).days
+print(f'tmp_day : {tmp_day}')
+if (tmp_day >= 7 and tmp_day <= 11):
+    day_no = tmp_day - 2
+elif tmp_day >= 14 and tmp_day <= 18:
+    day_no = tmp_day - 4
+
+print(day_no)
+exit(0)
+# print(f'day : {(today - start_day).days}')
+# 10 มกราคม 2568
+start_day  = datetime(2024, 12, 23)
+end_date = datetime(2025, 1, 10)
+today  = datetime.now()
+day_no = (today - start_day).days
+
+delta = timedelta(days=1)
+while (today <= end_date):
+    if (today.weekday() > 4):
+       print(today.strftime("%A"))
+    today += delta
+
+# print(delta)
