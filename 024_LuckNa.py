@@ -54,11 +54,7 @@ file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv')
 
 df = pd.read_csv(file_path)
 last_price = df.groupby('ShareCode').last()['LastPrice']
-# print(last_price)
-# sort value
 df['TradeDateTime'] = pd.to_datetime(df['TradeDateTime'])
-# print(df.head())
-# exit(0)
 df = df.sort_values(by='TradeDateTime')
 initial_investment = 10000000
 
@@ -118,6 +114,7 @@ if prev_portfolio_df is not None:
 else: #in case don't have portfolio
     prev_act_dict = {stock : 0 for stock in stock_dfs}
     start_dict = {stock : 0 for stock in stock_dfs}
+
     # for key, value in prev_act_dict.items():
         # print(f'{key} : {value}')
 
@@ -312,9 +309,7 @@ for stock_name in df_stock:
         portfolio_data['Actual Vol'].append(statement_lastrows['Actual Vol'][stock_name])
         portfolio_data['Avg Cost'].append(stock_totals[stock_name]['avg_cost'])
         portfolio_data['Market Price'].append(last_price[stock_name])
-        # portfolio_data['Market Price'].append(statement_lastrows['Price'][stock_name])
         portfolio_data['Market Value'].append(last_price[stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
-        # portfolio_data['Market Value'].append(statement_lastrows['Price'][stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
         portfolio_data['Amount Cost'].append(round(stock_totals[stock_name]['total_cost'], 4))  # No cost after selling
         
         unreal =  portfolio_data['Market Value'][-1] - stock_totals[stock_name]['total_cost'] # current - buy
@@ -332,35 +327,35 @@ for stock_name in df_stock:
         portfolio_data['% Unrealized P/L'].append(round(percent_unrealized_pl, 4))
         portfolio_data['Realized P/L'].append(realized_pl)
 
+if prev_portfolio_df is not None:
+    for key, value in prev_portfolio_df.iterrows():
+        tmp_stock = value['Stock name']
+        # print(tmp_stock)
+        if tmp_stock not in df_stock:
+            tmp_price = value['Market Price']
+            if tmp_stock in stock_totals:
+                tmp_price =  last_price[tmp_stock]
+            portfolio_data['Table Name'].append('Portfolio_file')
+            portfolio_data['File Name'].append(team_name)
+            portfolio_data['Stock name'].append(tmp_stock)
+            portfolio_data['Start Vol'].append(value['Actual Vol'])
+            portfolio_data['Actual Vol'].append(value['Actual Vol'])
+            portfolio_data['Avg Cost'].append(value['Avg Cost'])
+            portfolio_data['Market Price'].append(tmp_price)
+            portfolio_data['Market Value'].append(tmp_price * value['Actual Vol'])  # Market value after selling is 0
+            portfolio_data['Amount Cost'].append(value['Amount Cost'])  # No cost after selling
 
-for key, value in prev_portfolio_df.iterrows():
-    tmp_stock = value['Stock name']
-    # print(tmp_stock)
-    if tmp_stock not in df_stock:
-        tmp_price = value['Market Price']
-        if tmp_stock in stock_totals:
-            tmp_price =  last_price[tmp_stock]
-        portfolio_data['Table Name'].append('Portfolio_file')
-        portfolio_data['File Name'].append(team_name)
-        portfolio_data['Stock name'].append(tmp_stock)
-        portfolio_data['Start Vol'].append(value['Actual Vol'])
-        portfolio_data['Actual Vol'].append(value['Actual Vol'])
-        portfolio_data['Avg Cost'].append(value['Avg Cost'])
-        portfolio_data['Market Price'].append(tmp_price)
-        portfolio_data['Market Value'].append(tmp_price * value['Actual Vol'])  # Market value after selling is 0
-        portfolio_data['Amount Cost'].append(value['Amount Cost'])  # No cost after selling
+            tmp_total_cost = value['Actual Vol'] * portfolio_data['Avg Cost'][-1]
+            unreal =  portfolio_data['Market Value'][-1] - (tmp_total_cost)  # current - buy
 
-        tmp_total_cost = value['Actual Vol'] * portfolio_data['Avg Cost'][-1]
-        unreal =  portfolio_data['Market Value'][-1] - (tmp_total_cost)  # current - buy
-        
-        if tmp_total_cost == 0:
-            percent_unrealized_pl = 0
-        else:
-            percent_unrealized_pl = (unreal / tmp_total_cost) * 100
+            if tmp_total_cost == 0:
+                percent_unrealized_pl = 0
+            else:
+                percent_unrealized_pl = (unreal / tmp_total_cost) * 100
 
-        portfolio_data['Unrealized P/L'].append(round(unreal, 4))
-        portfolio_data['% Unrealized P/L'].append(round(percent_unrealized_pl, 4))
-        portfolio_data['Realized P/L'].append(0)
+            portfolio_data['Unrealized P/L'].append(round(unreal, 4))
+            portfolio_data['% Unrealized P/L'].append(round(percent_unrealized_pl, 4))
+            portfolio_data['Realized P/L'].append(0)
 
 
 portfolio_df = pd.DataFrame(portfolio_data)
