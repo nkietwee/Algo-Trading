@@ -48,8 +48,11 @@ def save_output(data, file_type, teamName):
 statements = []
 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20241217.csv') 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
+
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 
 df = pd.read_csv(file_path)
 last_price = df.groupby('ShareCode').last()['LastPrice']
@@ -66,6 +69,11 @@ prev_summary_df = load_previous("summary", team_name)
 # prev_statement_df = load_previous("statement", team_name)
 prev_portfolio_df = load_previous("portfolio", team_name)
 
+stock_previous = prev_portfolio_df['Stock name'].unique()
+# print(stock_previous)
+# print(len(stock_previous))
+
+# print(prev_portfolio_df)
 if prev_summary_df is not None:
     if 'End Line available' in prev_summary_df.columns:
         # ดึงค่าคอลัมน์ 'End Line available' ทั้งหมด
@@ -301,7 +309,7 @@ statement_lastrows = statement_df.groupby('Stock Name').last()
 df_stock = statement_lastrows.index.tolist()
 
 for stock_name in df_stock:
-    if statement_lastrows['Actual Vol'][stock_name] != 0 :
+    if statement_lastrows['Actual Vol'][stock_name] != 0:
         portfolio_data['Table Name'].append('Portfolio_file')
         portfolio_data['File Name'].append(team_name)
         portfolio_data['Stock name'].append(stock_name)
@@ -325,12 +333,43 @@ for stock_name in df_stock:
         else:
             realized_pl =  portfolio_data['Market Value'][-1] - (stock_totals[stock_name]['sell_volume'] * stock_totals[stock_name]['avg_cost'])
 
-        portfolio_data['Unrealized P/L'].append(unreal)
-        portfolio_data['% Unrealized P/L'].append(percent_unrealized_pl)
+        portfolio_data['Unrealized P/L'].append(round(unreal, 4))
+        portfolio_data['% Unrealized P/L'].append(round(percent_unrealized_pl, 4))
         portfolio_data['Realized P/L'].append(realized_pl)
 
-portfolio_df = pd.DataFrame(portfolio_data)
 
+for key, value in prev_portfolio_df.iterrows():
+    tmp_stock = value['Stock name']
+    # print(tmp_stock)
+    if tmp_stock not in df_stock:
+        tmp_price = value['Market Price']
+        if tmp_stock in stock_totals:
+            tmp_price =  last_price[tmp_stock]
+        portfolio_data['Table Name'].append('Portfolio_file')
+        portfolio_data['File Name'].append(team_name)
+        portfolio_data['Stock name'].append(tmp_stock)
+        portfolio_data['Start Vol'].append(value['Actual Vol'])
+        portfolio_data['Actual Vol'].append(value['Actual Vol'])
+        portfolio_data['Avg Cost'].append(value['Avg Cost'])
+        portfolio_data['Market Price'].append(tmp_price)
+        portfolio_data['Market Value'].append(tmp_price * value['Actual Vol'])  # Market value after selling is 0
+        portfolio_data['Amount Cost'].append(value['Amount Cost'])  # No cost after selling
+
+        tmp_total_cost = value['Actual Vol'] * portfolio_data['Avg Cost'][-1]
+        unreal =  portfolio_data['Market Value'][-1] - (tmp_total_cost)  # current - buy
+        
+        if tmp_total_cost == 0:
+            percent_unrealized_pl = 0
+        else:
+            percent_unrealized_pl = (unreal / tmp_total_cost) * 100
+
+        portfolio_data['Unrealized P/L'].append(round(unreal, 4))
+        portfolio_data['% Unrealized P/L'].append(round(percent_unrealized_pl, 4))
+        portfolio_data['Realized P/L'].append(0)
+
+
+portfolio_df = pd.DataFrame(portfolio_data)
+portfolio_df = portfolio_df.sort_values('Stock name')
 
 last_end_line_available = initial_balance
 if statement_df is not None:
@@ -368,7 +407,6 @@ summary_data = {
     'File Name': [team_name],
     'trading_day': [getday()],  
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
-    # 'Portfolio value': [portfolio_df['Market Value'].sum()],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
     'End Line available': [last_end_line_available],
     'Start Line available':[Start_Line_available],

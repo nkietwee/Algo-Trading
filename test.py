@@ -8,15 +8,16 @@ import os
 
 # file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv') 
 # file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/statement/024_LuckNa_statement.csv') 
-# file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv') 
+# # file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv') 
 
-# df = len(df['Stock name'].unique())
+# # df = len(df['Stock name'].unique())
 # df = pd.read_csv(file_path)
+# df = df.groupby('Stock Name').first()
+# df.to_csv("/home/nkietwee/Desktop/tmp.csv")
+# # df = df[df['Actual Vol'] < 0]
+# # df = df.tail()
 
-# df = df[df['Actual Vol'] < 0]
-# df = df.tail()
-
-# print(df.head(100))
+# print(df)
 # if os.path.exists(file_path):
 #     df = pd.read_csv(file_path)
 #     print(df)
@@ -163,9 +164,9 @@ import os
 
 # print(delta)
 
-import pandas as pd
+# import pandas as pd
 
-# Provided data as a dictionary
+# # Provided data as a dictionary
 data = {
     'ADVANC': {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value': 0, 'sell_volume': 0},
     'RATCH': {'total_cost': 63100.0, 'total_volume': 2000, 'avg_cost': 31.55, 'Market Value': 63000.0, 'sell_volume': 0},
@@ -177,21 +178,29 @@ data = {
     'PTTGC': {'total_cost': 255439.41, 'total_volume': 10600, 'avg_cost': 24.0981, 'Market Value': 252280.0, 'sell_volume': 100},
     'BJC': {'total_cost': 138780.0, 'total_volume': 5800, 'avg_cost': 23.9276, 'Market Value': 138040.0, 'sell_volume': 0},
     'BTS': {'total_cost': 80990.0, 'total_volume': 13400, 'avg_cost': 6.044, 'Market Value': 79730.0, 'sell_volume': 0}
+    'bTS': {'total_cost': 80990.0, 'total_volume': 13400, 'avg_cost': 6.044, 'Market Value': 79730.0, 'sell_volume': 0}
     # The rest of the data can be appended similarly
 }
 
-sum_market = 0
-for key, value in data.items():
-    # print(f'{key} : {value['Market Value']}')
-    if key:
-        sum_market += value['Market Value']
+# sum_market = 0
+# for key, value in data.items():
+#     # print(f'{key} : {value['Market Value']}')
+#     if key:
+#         sum_market += value['Market Value']
 
-print(sum_market)
-print(data.get('Market Value'))
+# print(sum_market)
+# print(data.get('Market Value'))
 # tmp = sum(list(data.keys()))
 
 # # Converting the data into a pandas DataFrame
 # df = pd.DataFrame.from_dict(data, orient='index')
+# df = data.sort_values()
+# print(df)
 # print(df['Market Value'])
 # print(df['Market Value'].sum())
 # # print(df.head())
+
+# df_stock = ['A', 'B']
+# tmp = 'A'    
+# if tmp not in df_stock:
+#     print('tmp')
