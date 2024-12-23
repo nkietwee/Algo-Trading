@@ -189,12 +189,12 @@ summary_data = {
 # List of variable trading volumes
 volume_options = [100, 200, 300, 500]
 
-stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value' : 0, 'sell_volume' : 0} for stock in stock_dfs}
+stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value' : 0, 'sell_volume' : 0, 'price' : 0} for stock in stock_dfs}
 
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
-    price = row['LastPrice']
+    stock_totals[stock_name]['price'] = row['LastPrice']
     rsi = row['RSI']
     date_time = row['TradeDateTime']
 
@@ -205,9 +205,8 @@ for index, row in df.iterrows():
     # volume = 100
 
     # Buy condition
-    # if rsi < buy_threshold and initial_balance >= price * volume and stock_totals[stock_name]['buy_state'] == 0:
-    if rsi < buy_threshold and initial_balance >= price * volume:
-        cost = price * volume
+    if rsi < buy_threshold and initial_balance >= stock_totals[stock_name]['price'] * volume:
+        cost = stock_totals[stock_name]['price'] * volume
         initial_balance -= cost
         start_vol = int(prev_act_dict[stock_name]) #act_vol
         act_vol = start_vol + volume
@@ -229,29 +228,28 @@ for index, row in df.iterrows():
         statement_data['Side'].append('Buy')
         statement_data['Volume'].append(volume)
         statement_data['Actual Vol'].append(prev_act_dict[stock_name])
-        statement_data['Price'].append(price)
+        statement_data['Price'].append(stock_totals[stock_name]['price'])
         statement_data['Amount Cost'].append(cost)
         statement_data['End Line available'].append(initial_balance)
         
         # for use in portfolio
-        stock_totals[stock_name]['Market Value'] = act_vol * price
-        # sum_market = 0 
-        # for key, value in stock_totals.items():
-        #     if key:
-        #         sum_market += float(value['Market Value'])
+        stock_totals[stock_name]['Market Value'] = act_vol * stock_totals[stock_name]['price']
+        sum_market = 0
+        for key, value in stock_totals.items():
+            if key:
+                sum_market += prev_act_dict[key] * float(value['price'])
 
-
-        # statement_data['Portfolio value'].append(sum_market)
-        # statement_data['NAV'].append(sum_market + initial_balance)
+        statement_data['Portfolio value'].append(sum_market)
+        statement_data['NAV'].append(sum_market + initial_balance)
         
-        statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
-        statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
+        # statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
+        # statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
 
     # Sell condition
     # Don't forget to cut loss
     elif rsi > sell_threshold and prev_act_dict[stock_name] > 0 and volume <= prev_act_dict[stock_name]:
-        revenue = price * volume
+        revenue = stock_totals[stock_name]['price'] * volume
         initial_balance += revenue
         start_vol = int(prev_act_dict[stock_name]) #act_vol
         act_vol = start_vol - volume
@@ -273,22 +271,23 @@ for index, row in df.iterrows():
         statement_data['Side'].append('Sell')
         statement_data['Volume'].append(volume)
         statement_data['Actual Vol'].append(prev_act_dict[stock_name]) 
-        statement_data['Price'].append(price)
+        statement_data['Price'].append(stock_totals[stock_name]['price'])
         statement_data['Amount Cost'].append(revenue)
         statement_data['End Line available'].append(initial_balance)
 
-        stock_totals[stock_name]['Market Value'] = act_vol * price
+        stock_totals[stock_name]['Market Value'] = act_vol * stock_totals[stock_name]['price']
         stock_totals[stock_name]['sell_volume'] += volume
         
-        # sum_market = 0 
-        # for key, value in stock_totals.items():
-        #     if key:
-        #         sum_market += float(value['Market Value'])
-        # statement_data['Portfolio value'].append(sum_market)
-        # statement_data['NAV'].append(sum_market + initial_balance)
+        sum_market = 0
+        for key, value in stock_totals.items():
+            if key:
+                sum_market += prev_act_dict[key] * float(value['price'])
 
-        statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
-        statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
+        statement_data['Portfolio value'].append(sum_market)
+        statement_data['NAV'].append(sum_market + initial_balance)
+
+        # statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
+        # statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
 
     if initial_balance <= 2500000:
         # print("keep money")
@@ -314,7 +313,6 @@ for stock_name in df_stock:
         portfolio_data['Market Value'].append(last_price[stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
         # portfolio_data['Market Value'].append(statement_lastrows['Price'][stock_name] * statement_lastrows['Actual Vol'][stock_name])  # Market value after selling is 0
         portfolio_data['Amount Cost'].append(round(stock_totals[stock_name]['total_cost'], 4))  # No cost after selling
-        realized_pl = (price - stock_totals[stock_name]['avg_cost']) * prev_act_dict[stock_name]
         
         unreal =  portfolio_data['Market Value'][-1] - stock_totals[stock_name]['total_cost'] # current - buy
         if stock_totals[stock_name]['total_cost'] == 0:
