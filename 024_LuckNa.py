@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
-from datetime import datetime
+from datetime import datetime, date
 from datetime import time
 from ta.momentum import RSIIndicator
 
@@ -47,15 +47,28 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_23.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_25.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_31.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 
 df = pd.read_csv(file_path)
 last_price = df.groupby('ShareCode').last()['LastPrice']
 df['TradeDateTime'] = pd.to_datetime(df['TradeDateTime'])
 df = df.sort_values(by='TradeDateTime')
+
+
+# print(f'today_ : {df['TradeDateTime'][0].to_pydatetime() }')
+# print(f'today_ : {type(df['TradeDateTime'][0].to_pydatetime()) }')
+# exit(0)
+day_from_daily = df['TradeDateTime'][0].to_pydatetime()
+# print(f'type_ : {type(day_from_daily)}')
+# print(f'today_ : {day_from_daily}')
+# exit(0)
+
 initial_investment = 10000000
 
 # Load the prev file
@@ -96,6 +109,7 @@ else:
     initial_balance = initial_investment  # ใช้ค่าตั้งต้นหากไฟล์ไม่โหลด
     Start_Line_available = initial_investment
     prev_win_rate = 0
+
     print(f"Initial balance = initial_investment: {initial_investment}")
 
 stock_dfs = df['ShareCode'].unique() # current stock
@@ -375,17 +389,21 @@ else:
     win_rate = 0
 
 def getday():
-    start_day  = datetime(2024, 12, 23)
-    # today  = datetime(2025, 1, 9)
-    today  = datetime.now()
+    start_day  = datetime(2024, 12, 19)
+    # print(f' type_startday : {type(start_day)}')
+    today  = day_from_daily
+    # print(f'today : {today}')
     tmp_day = (today - start_day).days
     day_no = 0
-    if (tmp_day < 7):
+
+    if tmp_day == 1:
         day_no = tmp_day
-    elif (tmp_day >= 7 and tmp_day <= 11):
+    elif tmp_day >= 2 and tmp_day <= 6:
         day_no = tmp_day - 2
-    elif tmp_day >= 14 and tmp_day <= 18:
+    elif tmp_day >= 9 and tmp_day <= 13:
         day_no = tmp_day - 4
+    elif tmp_day >= 16 and tmp_day <= 19:
+        day_no = tmp_day - 6
     return (day_no)
 
 # for key, value in stock_totals.items():
@@ -395,6 +413,7 @@ def getday():
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
+    # 'trading_day': [cal_dayNo(day_from_daily)],
     'trading_day': [getday()],
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
