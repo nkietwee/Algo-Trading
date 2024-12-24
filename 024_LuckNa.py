@@ -47,12 +47,13 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_23.csv')
+
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_25.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_31.csv')
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 
 df = pd.read_csv(file_path)
@@ -377,11 +378,18 @@ portfolio_df = portfolio_df.sort_values('Stock name')
 count_win = 0
 count_sell = 0
 win_rate = 0
+max_dd = round((statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max(), 4)
+res_maxdd = 0
 transac = len(statement_df)
 if prev_summary_df is not None: #have
     count_win = sum(1 for _, row in prev_summary_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0) 
     count_sell = len(statement_df[prev_summary_df['Side'] == 'Sell'])
     transac += prev_summary_df['Number of transactions'][-1]
+    prev_maxdd = prev_summary_df['Maximum Drawdown']
+    if (max_dd > prev_maxdd):
+        res_maxdd = max_dd
+    else:
+        res_maxdd = prev_maxdd
 
 last_end_line_available = initial_balance
 
@@ -429,7 +437,6 @@ summary_data = {
     'Start Line available':[Start_Line_available],
     'Number of wins': [count_win],
     'Number of matched trades': [count_sell],
-    # 'Number of transactions': [prev_summary_df['Number of transactions'][-1] + len(statement_df)],
     'Number of transactions': [transac],
 
     'Net Amount': [statement_df['Amount Cost'].sum()],
@@ -442,7 +449,7 @@ summary_data = {
     'Calmar Ratio': [round(((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
                            ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000), 4)] ,
     'Relative Drawdown': [round((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100, 4)],
-    'Maximum Drawdown': [round((statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max(), 4) ],
+    'Maximum Drawdown': [res_maxdd],
     '%Return': [round((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100, 4)]
 }
 
