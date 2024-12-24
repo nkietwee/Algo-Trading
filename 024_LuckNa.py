@@ -49,26 +49,15 @@ statements = []
 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
 file_path = os.path.expanduser('~/Desktop/Daily_Ticks_23.csv')
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_25.csv')
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_31.csv')
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 
 df = pd.read_csv(file_path)
 last_price = df.groupby('ShareCode').last()['LastPrice']
 df['TradeDateTime'] = pd.to_datetime(df['TradeDateTime'])
 df = df.sort_values(by='TradeDateTime')
-
-
-# print(f'today_ : {df['TradeDateTime'][0].to_pydatetime() }')
-# print(f'today_ : {type(df['TradeDateTime'][0].to_pydatetime()) }')
-# exit(0)
-day_from_daily = df['TradeDateTime'][0].to_pydatetime()
-# print(f'type_ : {type(day_from_daily)}')
-# print(f'today_ : {day_from_daily}')
-# exit(0)
 
 initial_investment = 10000000
 
@@ -77,10 +66,6 @@ prev_summary_df = load_previous("summary", team_name)
 prev_statement_df = load_previous("statement", team_name)
 prev_portfolio_df = load_previous("portfolio", team_name)
 
-# print(prev_summary_df['Number of wins'])
-# print(type(prev_summary_df['Number of wins']))
-# exit(0)
-# print(prev_portfolio_df)
 if prev_summary_df is not None:
     if 'End Line available' in prev_summary_df.columns:
         # ดึงค่าคอลัมน์ 'End Line available' ทั้งหมด
@@ -89,13 +74,14 @@ if prev_summary_df is not None:
         # ตรวจสอบว่าคอลัมน์ไม่ว่างเปล่า
         if not initial_balance_series.empty:
             # เข้าถึงค่าแรกของคอลัมน์
-            first_value = initial_balance_series.iloc[0]
+            first_value = initial_balance_series.iloc[-1]
             
             # ลบเครื่องหมายคั่นหลักพันและแปลงเป็น float
             try:
                 initial_balance = float(str(first_value).replace(',', '').strip())
                 Start_Line_available = initial_balance
                 prev_win_rate = prev_summary_df['Win rate'][0]
+                prev_trading_day = len(prev_summary_df)
                 # print(f'pre_win_rate : {prev_win_rate}')
                 print("End Line available column loaded successfully.")
                 print(f"Initial balance (first value): {initial_balance}")
@@ -112,6 +98,7 @@ else:
     initial_balance = initial_investment  # ใช้ค่าตั้งต้นหากไฟล์ไม่โหลด
     Start_Line_available = initial_investment
     prev_win_rate = 0
+    prev_trading_day = 0
 
     print(f"Initial balance = initial_investment: {initial_investment}")
 
@@ -390,7 +377,7 @@ win_rate = 0
 max_dd = round((statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max(), 4)
 # print(f'max_dd : {max_dd}')
 # exit(0)
-res_maxdd = 0
+res_maxdd = max_dd
 transac = len(statement_df)
 if prev_summary_df is not None: #have
     # total = stock_totals[stock_name]['price'] * row[]
@@ -416,31 +403,13 @@ if statement_df is not None:
     else:
         win_rate = (count_win * 100) / count_sell
 
-
-def getday():
-    start_day  = datetime(2024, 12, 19)
-    # print(f' type_startday : {type(start_day)}')
-    today  = day_from_daily
-    # print(f'today : {today}')
-    tmp_day = (today - start_day).days
-    day_no = 0
-
-    if tmp_day == 1:
-        day_no = tmp_day
-    elif tmp_day >= 2 and tmp_day <= 6:
-        day_no = tmp_day - 2
-    elif tmp_day >= 9 and tmp_day <= 13:
-        day_no = tmp_day - 4
-    elif tmp_day >= 16 and tmp_day <= 19:
-        day_no = tmp_day - 6
-    return (day_no)
-
 # for key, value in stock_totals.items():
 #     print(f'{key} : {value}')
+
 summary_data_today = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
-    'trading_day': [getday()],
+    'trading_day': [prev_trading_day + 1],
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
     'End Line available': [last_end_line_available],

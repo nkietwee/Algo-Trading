@@ -1,9 +1,13 @@
 
-# import pandas as pd
-# import os
+import pandas as pd
+import os
 
+file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Previous/summary/024_LuckNa_summary.csv")
+
+df = pd.read_csv(file_path)
+print(len(df))
 # # # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/*.csv")
-# # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
 # # file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
 
 # # file_path = os.path.expanduser('/home/nkietwee/Desktop/competition_api/Result/portfolio/024_LuckNa_portfolio.csv') 
@@ -220,30 +224,30 @@
 #         day_no = tmp_day - 4
 #     return (day_no)
 
-# print(getday())
-from datetime import datetime, timedelta
+# # print(getday())
+# from datetime import datetime, timedelta
 
-end_date = datetime(2025, 1, 11)
-delta = timedelta(days=1)
-today = datetime.today()
+# end_date = datetime(2025, 1, 11)
+# delta = timedelta(days=1)
+# today = datetime.today()
 
-def cal_dayNo(today):
-    start_date = datetime(2024, 12, 20)
+# def cal_dayNo(today):
+#     start_date = datetime(2024, 12, 20)
 
-    total_days = (today - start_date).days + 1
+#     total_days = (today - start_date).days + 1
 
-    full_weeks, extra_days = divmod(total_days, 7)
-    weekdays = (full_weeks * 5)
+#     full_weeks, extra_days = divmod(total_days, 7)
+#     weekdays = (full_weeks * 5)
 
-    start_day = start_date.weekday()
-    for i in range(extra_days):
-        if (start_day + i) % 7 < 5:
-            weekdays += 1
-    return weekdays
+#     start_day = start_date.weekday()
+#     for i in range(extra_days):
+#         if (start_day + i) % 7 < 5:
+#             weekdays += 1
+#     return weekdays
 
-print(cal_dayNo(today))
-# while (today < end_date):
-#     print(today)
-#     print(today.strftime("%A"))
-#     print(f"day: {cal_dayNo(today)}")
-#     today += delta
+# print(cal_dayNo(today))
+# # while (today < end_date):
+# #     print(today)
+# #     print(today.strftime("%A"))
+# #     print(f"day: {cal_dayNo(today)}")
+# #     today += delta
