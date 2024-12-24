@@ -205,7 +205,7 @@ summary_data = {
 volume_options = [100, 200, 300, 500]
 
 stock_totals = {stock: {'total_cost': 0, 'total_volume': 0, 'avg_cost': 0, 'Market Value' : 0, 'sell_volume' : 0, 'price' : 0} for stock in stock_dfs}
-
+count_win = 0
 # Trading loop
 for index, row in df.iterrows():
     stock_name = row['ShareCode']
@@ -269,6 +269,10 @@ for index, row in df.iterrows():
         start_vol = int(prev_act_dict[stock_name]) #act_vol
         act_vol = start_vol - volume
         prev_act_dict[stock_name] = (act_vol)
+        
+        tmp_cost =   stock_totals[stock_name]['avg_cost'] * volume
+        if revenue > tmp_cost:
+            count_win+= 1
 
         stock_totals[stock_name]['total_cost'] -= volume * stock_totals[stock_name]['avg_cost']
         stock_totals[stock_name]['total_volume'] -= volume
@@ -300,6 +304,7 @@ for index, row in df.iterrows():
 
         statement_data['Portfolio value'].append(sum_market)
         statement_data['NAV'].append(sum_market + initial_balance)
+
 
         # statement_data['Portfolio value'].append(stock_totals[stock_name]['Market Value'])
         # statement_data['NAV'].append(float(stock_totals[stock_name]['Market Value']) + initial_balance)
@@ -375,15 +380,16 @@ if prev_portfolio_df is not None:
 
 portfolio_df = pd.DataFrame(portfolio_data)
 portfolio_df = portfolio_df.sort_values('Stock name')
-count_win = 0
+# count_win = 0
 count_sell = 0
 win_rate = 0
 max_dd = round((statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max(), 4)
 res_maxdd = 0
 transac = len(statement_df)
 if prev_summary_df is not None: #have
-    count_win = sum(1 for _, row in prev_summary_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0) 
-    count_sell = len(statement_df[prev_summary_df['Side'] == 'Sell'])
+    # total = stock_totals[stock_name]['price'] * row[]
+    count_win = prev_summary_df['Number of wins']
+    count_sell = prev_summary_df['Number of matched trades']
     transac += prev_summary_df['Number of transactions'][-1]
     prev_maxdd = prev_summary_df['Maximum Drawdown']
     if (max_dd > prev_maxdd):
@@ -394,7 +400,8 @@ if prev_summary_df is not None: #have
 last_end_line_available = initial_balance
 
 if statement_df is not None:
-    count_win += sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0) 
+    count_win = count_win 
+    # count_win += sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Realized P/L'] >= 0) 
     count_sell += len(statement_df[statement_df['Side'] == 'Sell'])
 
     if count_sell == 0:
