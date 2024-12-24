@@ -73,7 +73,7 @@ initial_investment = 10000000
 
 # Load the prev file
 prev_summary_df = load_previous("summary", team_name)
-# prev_statement_df = load_previous("statement", team_name)
+prev_statement_df = load_previous("statement", team_name)
 prev_portfolio_df = load_previous("portfolio", team_name)
 
 
@@ -374,19 +374,26 @@ if prev_portfolio_df is not None:
 
 portfolio_df = pd.DataFrame(portfolio_data)
 portfolio_df = portfolio_df.sort_values('Stock name')
+count_win = 0
+count_sell = 0
+win_rate = 0
+transac = len(statement_df)
+if prev_summary_df is not None: #have
+    count_win = sum(1 for _, row in prev_summary_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0) 
+    count_sell = len(statement_df[prev_summary_df['Side'] == 'Sell'])
+    transac += prev_summary_df['Number of transactions'][-1]
 
 last_end_line_available = initial_balance
+
 if statement_df is not None:
-    count_win = sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0)
-    count_sell = len(statement_df[statement_df['Side'] == 'Sell'])
+    count_win += sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Amount Cost'] > 0) 
+    count_sell += len(statement_df[statement_df['Side'] == 'Sell'])
+
     if count_sell == 0:
         win_rate = prev_win_rate
     else:
         win_rate = (count_win * 100) / count_sell
-else:
-    count_win = 0
-    count_sell = 0
-    win_rate = 0
+
 
 def getday():
     start_day  = datetime(2024, 12, 19)
@@ -410,6 +417,7 @@ def getday():
 #     print(f'{key} : {value}')
 # print(stock_totals)
 
+
 summary_data = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
@@ -421,7 +429,9 @@ summary_data = {
     'Start Line available':[Start_Line_available],
     'Number of wins': [count_win],
     'Number of matched trades': [count_sell],
-    'Number of transactions': [len(statement_df)],
+    # 'Number of transactions': [prev_summary_df['Number of transactions'][-1] + len(statement_df)],
+    'Number of transactions': [transac],
+
     'Net Amount': [statement_df['Amount Cost'].sum()],
     'Sum of Unrealized P/L': [round(portfolio_df['Unrealized P/L'].sum(), 4)],
     'Sum of %Unrealized P/L': [round(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100, 4) if initial_investment else 0],
