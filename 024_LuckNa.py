@@ -47,11 +47,13 @@ def save_output(data, file_type, teamName):
 
 statements = []
 
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_17.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_18.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_19.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_23.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_23.csv')
 
 
 df = pd.read_csv(file_path)
@@ -403,8 +405,27 @@ if statement_df is not None:
     else:
         win_rate = (count_win * 100) / count_sell
 
+    max_value = statement_df['NAV'].max()
+    max_index = statement_df['NAV'].idxmax()  # ดัชนีของ Maximum Value
+    min_value_after_max = statement_df.loc[max_index:, 'NAV'].min()
+
+
 # for key, value in stock_totals.items():
 #     print(f'{key} : {value}')
+if max_dd == 0:
+    calmar_ratio = 0
+else:
+    calmar_ratio = round(((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) /  max_dd , 4)
+
+
+if max_value != 0:
+    res_drawdown =  round((res_maxdd / max_value) * 100, 4)
+else:
+    res_drawdown = 0
+
+# print(f'res_drawdown : {res_drawdown}')
+# print(f'res_maxdd : {res_maxdd}')
+# print(f'max_value : {max_value}')
 
 summary_data_today = {
     'Table Name': ['Sum_file'],
@@ -422,12 +443,11 @@ summary_data_today = {
     'Sum of Unrealized P/L': [round(portfolio_df['Unrealized P/L'].sum(), 4)],
     'Sum of %Unrealized P/L': [round(portfolio_df['Unrealized P/L'].sum() / initial_investment * 100, 4) if initial_investment else 0],
     'Sum of Realized P/L': [round(portfolio_df['Realized P/L'].sum(), 4)],
-    'Maximum value': [statement_df['End Line available'].max()],
-    'Minimum value': [statement_df['End Line available'].min()],
+    'Maximum value': [max_value],
+    'Minimum value': [min_value_after_max],
     'Win rate': [round(win_rate, 4)],
-    'Calmar Ratio': [round(((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) / \
-                           ((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000), 4)] ,
-    'Relative Drawdown': [round((portfolio_df['Market Value'].sum() + last_end_line_available - 10_000_000) / 10_000_000 / statement_df['End Line available'].max() * 100, 4)],
+    'Calmar Ratio': [calmar_ratio] ,
+    'Relative Drawdown': [res_drawdown],
     'Maximum Drawdown': [res_maxdd],
     '%Return': [round((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100, 4)]
 }

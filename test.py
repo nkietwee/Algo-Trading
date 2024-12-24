@@ -1,11 +1,11 @@
 
-import pandas as pd
-import os
+# import pandas as pd
+# import os
 
-file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Previous/summary/024_LuckNa_summary.csv")
+# file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Previous/summary/024_LuckNa_summary.csv")
 
-df = pd.read_csv(file_path)
-print(len(df))
+# df = pd.read_csv(file_path)
+# print(len(df))
 # # # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/*.csv")
 # file_path = os.path.expanduser("/home/nkietwee/Desktop/competition_api/Result/summary/024_LuckNa_summary.csv")
 # # file_path = os.path.expanduser("/home/nkietwee/Desktop/Daily_Ticks.csv")
@@ -251,3 +251,22 @@ print(len(df))
 # #     print(today.strftime("%A"))
 # #     print(f"day: {cal_dayNo(today)}")
 # #     today += delta
+
+import pandas as pd
+
+# Example balance data (Equity over time)
+data = {
+    'Equity': [1000000, 1200000, 1150000, 1100000, 1250000, 1050000, 1300000, 1250000, 1000000]
+}
+
+df = pd.DataFrame(data)
+
+df['Peak Equity'] = df['Equity'].cummax()
+df['Drawdown'] = df['Peak Equity'] - df['Equity']
+max_drawdown = df['Drawdown'].max()
+min_equity = df['Equity'].min()
+
+# Print results
+print(df)
+print(f"Maximum Drawdown: {max_drawdown}")
+print(f"Minimal Equity: {min_equity}")
