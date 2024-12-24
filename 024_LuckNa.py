@@ -49,8 +49,8 @@ statements = []
 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks.csv') 
 
-file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
-# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_23.csv')
+# file_path = os.path.expanduser('~/Desktop/Daily_Ticks_20.csv')
+file_path = os.path.expanduser('~/Desktop/Daily_Ticks_23.csv')
 
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_25.csv')
 # file_path = os.path.expanduser('~/Desktop/Daily_Ticks_31.csv')
@@ -77,7 +77,9 @@ prev_summary_df = load_previous("summary", team_name)
 prev_statement_df = load_previous("statement", team_name)
 prev_portfolio_df = load_previous("portfolio", team_name)
 
-
+# print(prev_summary_df['Number of wins'])
+# print(type(prev_summary_df['Number of wins']))
+# exit(0)
 # print(prev_portfolio_df)
 if prev_summary_df is not None:
     if 'End Line available' in prev_summary_df.columns:
@@ -383,14 +385,18 @@ portfolio_df = portfolio_df.sort_values('Stock name')
 count_sell = 0
 win_rate = 0
 max_dd = round((statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max(), 4)
+# print(f'max_dd : {max_dd}')
+# exit(0)
 res_maxdd = 0
 transac = len(statement_df)
 if prev_summary_df is not None: #have
     # total = stock_totals[stock_name]['price'] * row[]
-    count_win += prev_summary_df['Number of wins']
-    count_sell = prev_summary_df['Number of matched trades']
-    transac += prev_summary_df['Number of transactions'][-1]
-    prev_maxdd = prev_summary_df['Maximum Drawdown']
+    count_win += int(prev_summary_df['Number of wins'].iloc[0])
+    count_sell = int(prev_summary_df['Number of matched trades'].iloc[0])
+    transac += int(prev_summary_df['Number of transactions'].iloc[0])
+    prev_maxdd = float(prev_summary_df['Maximum Drawdown'].iloc[0])
+    # print(f'prev_max_dd : {type(prev_maxdd)}')
+# exit(0)
     if (max_dd > prev_maxdd):
         res_maxdd = max_dd
     else:
