@@ -380,7 +380,6 @@ if prev_portfolio_df is not None:
 
 portfolio_df = pd.DataFrame(portfolio_data)
 portfolio_df = portfolio_df.sort_values('Stock name')
-# count_win = 0
 count_sell = 0
 win_rate = 0
 max_dd = round((statement_df['End Line available'].min() - statement_df['End Line available'].max()) / statement_df['End Line available'].max(), 4)
@@ -388,7 +387,7 @@ res_maxdd = 0
 transac = len(statement_df)
 if prev_summary_df is not None: #have
     # total = stock_totals[stock_name]['price'] * row[]
-    count_win = prev_summary_df['Number of wins']
+    count_win += prev_summary_df['Number of wins']
     count_sell = prev_summary_df['Number of matched trades']
     transac += prev_summary_df['Number of transactions'][-1]
     prev_maxdd = prev_summary_df['Maximum Drawdown']
@@ -400,8 +399,7 @@ if prev_summary_df is not None: #have
 last_end_line_available = initial_balance
 
 if statement_df is not None:
-    count_win = count_win 
-    # count_win += sum(1 for _, row in statement_df.iterrows() if row['Side'] == 'Sell' and row['Realized P/L'] >= 0) 
+    # count_win = count_win
     count_sell += len(statement_df[statement_df['Side'] == 'Sell'])
 
     if count_sell == 0:
