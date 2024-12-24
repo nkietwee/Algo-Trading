@@ -84,6 +84,7 @@ if prev_summary_df is not None:
                 Start_Line_available = initial_balance
                 prev_win_rate = prev_summary_df['Win rate'][0]
                 prev_trading_day = len(prev_summary_df)
+                prev_return = prev_summary_df['%Return'].sum()
                 # print(f'pre_win_rate : {prev_win_rate}')
                 print("End Line available column loaded successfully.")
                 print(f"Initial balance (first value): {initial_balance}")
@@ -101,7 +102,7 @@ else:
     Start_Line_available = initial_investment
     prev_win_rate = 0
     prev_trading_day = 0
-
+    prev_return = 0
     print(f"Initial balance = initial_investment: {initial_investment}")
 
 stock_dfs = df['ShareCode'].unique() # current stock
@@ -412,10 +413,11 @@ if statement_df is not None:
 
 # for key, value in stock_totals.items():
 #     print(f'{key} : {value}')
+tmp_return = ((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100)
 if max_dd == 0:
     calmar_ratio = 0
 else:
-    calmar_ratio = round(((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100) /  max_dd , 4)
+    calmar_ratio = round(tmp_return /  max_dd , 4)
 
 
 if max_value != 0:
@@ -426,6 +428,7 @@ else:
 # print(f'res_drawdown : {res_drawdown}')
 # print(f'res_maxdd : {res_maxdd}')
 # print(f'max_value : {max_value}')
+# print(f'tmp_return : {tmp_return}')
 
 summary_data_today = {
     'Table Name': ['Sum_file'],
@@ -449,7 +452,7 @@ summary_data_today = {
     'Calmar Ratio': [calmar_ratio] ,
     'Relative Drawdown': [res_drawdown],
     'Maximum Drawdown': [res_maxdd],
-    '%Return': [round((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100, 4)]
+    '%Return': [round(tmp_return, 4)]
 }
 summary_data_today = pd.DataFrame(summary_data_today)
 if prev_summary_df is not None:
