@@ -185,12 +185,15 @@ statement_data = {
 summary_data = {
     'Table Name': [],
     'File Name': [],
+    'trading_day' : [],
     'NAV': [],
+    'Portfolio value' : [],
     'End Line available': [],
     'Start Line available': [],
     'Number of wins': [], 
     'Number of matched trades': [],
-    'Number of transactions:': [],
+    'Number of transactions': [],
+    'Net Amount' : [], 
     'Sum of Unrealized P/L': [],
     'Sum of %Unrealized P/L':[],
     'Sum of Realized P/L': [],
@@ -434,13 +437,9 @@ def getday():
 
 # for key, value in stock_totals.items():
 #     print(f'{key} : {value}')
-# print(stock_totals)
-
-
-summary_data = {
+summary_data_today = {
     'Table Name': ['Sum_file'],
     'File Name': [team_name],
-    # 'trading_day': [cal_dayNo(day_from_daily)],
     'trading_day': [getday()],
     'NAV': [portfolio_df['Market Value'].sum() + last_end_line_available],
     'Portfolio value': [portfolio_df['Market Value'].sum()],
@@ -463,9 +462,13 @@ summary_data = {
     'Maximum Drawdown': [res_maxdd],
     '%Return': [round((portfolio_df['Market Value'].sum() + last_end_line_available - initial_investment) / initial_investment * 100, 4)]
 }
-
-# Maximum Drawdown = ((Minimum Value − Maximum Value) / Maximum Value)*100
-summary_df = pd.DataFrame(summary_data)
+summary_data_today = pd.DataFrame(summary_data_today)
+if prev_summary_df is not None:
+    summary_data = prev_summary_df.copy()
+    summary_data = pd.concat([summary_data, summary_data_today], ignore_index=True)
+    summary_df = pd.DataFrame(summary_data)
+else: 
+    summary_df = pd.DataFrame(summary_data_today)
 
 # # Save outputs
 save_output(portfolio_df, "portfolio", team_name)
